@@ -1,0 +1,116 @@
+@use "typography" as tp;
+@use "colors";
+@use "sass:color";
+.result {
+  padding-top: 2rem;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+
+  &__upper {
+    width: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-direction: row-reverse;
+    font-size: tp.$lg;
+
+    &__title {
+      margin-left: 1rem;
+      color: colors.$secondary;
+    }
+
+    &__icon {
+      @media only screen and (max-width: 355px) {
+        display: none !important;
+      }
+    }
+  }
+
+  &__center {
+    width: min(100%, 23rem);
+    &__table {
+      width: 100% !important;
+      border: 2px solid colors.$primary;
+      border-radius: 0.5rem;
+      padding: 0;
+      border-collapse: collapse;
+
+      &__tr {
+        display: flex;
+        justify-content: space-between;
+        flex-direction: row-reverse;
+        padding: 0.5rem;
+
+        &:nth-child(odd) {
+          $bg-color: darken(colors.$primary, 5);
+          background-color: color.change($bg-color, $alpha: 0.6);
+        }
+        &__td {
+          flex-basis: 50%;
+          text-align: right;
+        }
+      }
+    }
+  }
+}
+
+$icon-ratio: 64px;
+$icon-inner-width: 64px;
+$icon-inner-height: 10px;
+
+.gg-close-r {
+  box-sizing: border-box;
+  position: relative;
+  display: block;
+  transform: scale(var(--ggs, 1));
+  width: $icon-ratio;
+  height: $icon-ratio;
+  border: 3px solid;
+  border-radius: 6px;
+  color: colors.$error;
+}
+.gg-close-r::after,
+.gg-close-r::before {
+  content: "";
+  display: block;
+  box-sizing: border-box;
+  position: absolute;
+  width: $icon-inner-width;
+  height: 4px;
+  background: currentColor;
+  transform: rotate(45deg);
+  border-radius: 5px;
+  top: 27px;
+  left: -3px;
+}
+.gg-close-r::after {
+  transform: rotate(-45deg);
+}
+
+.gg-check-r {
+  box-sizing: border-box;
+  position: relative;
+  display: block;
+  width: $icon-ratio;
+  height: $icon-ratio;
+  border: 3px solid colors.$success;
+  transform: scale(var(--ggs, 1));
+  border-radius: 4px;
+}
+.gg-check-r::after {
+  content: "";
+  display: block;
+  box-sizing: border-box;
+  position: absolute;
+  left: 4px;
+  top: -17px;
+  width: 24px;
+  height: 50px;
+  border-width: 0 4px 4px 0;
+  border-style: solid;
+  border-color: colors.$success;
+  transform-origin: bottom left;
+  transform: rotate(45deg);
+}

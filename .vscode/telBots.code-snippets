@@ -1,0 +1,45 @@
+{
+  "tel bot controller": {
+    "prefix": "telbot",
+    "body": [
+      "import { SessionStates } from '@constants/bot/session';",
+      "import ControllerTypes from '@constants/controllerTypes';",
+      "import { Controller, ReplyMarkup } from '@t/controller';",
+      "import buttons from '@view/reply-markups'",
+      "import { isOrderTypeTomorrow, getControllerResult,setOrderSession } from '@helper/bot';",
+      "import OrderMessages from '@view/messages';",
+      "",
+      "const $TM_FILENAME_BASE: Controller = function (ctx) {",
+      "const entry = ctx.message?.text as string;",
+      "const messages = new OrderMessages(ctx, isOrderTypeTomorrow(ctx));",
+      "$3",
+      "};",
+      "",
+      "$TM_FILENAME_BASE.type = ControllerTypes.${1|COMMAND,KEYWORD,RETURN,STATE,QUERY|};",
+      "$TM_FILENAME_BASE.occasion = $2;",
+      "",
+      "export default $TM_FILENAME_BASE;"
+    ]
+  },
+  "tel bot return controller": {
+    "prefix": "telbotr",
+    "body": [
+      "import { SessionStates } from '@constants/bot/session';",
+      "import ControllerTypes from '@constants/controllerTypes';",
+      "import { Controller, ReplyMarkup } from '@t/controller';",
+      "import buttons from '@view/reply-markups'",
+      "import { isOrderTypeTomorrow, getControllerResult,setOrderSession } from '@helper/bot';",
+      "import OrderMessages from '@view/messages';",
+      "",
+      "const $TM_FILENAME_BASE: Controller = function (ctx) {",
+      "const messages = new OrderMessages(ctx, isOrderTypeTomorrow(ctx));",
+      "$2",
+      "};",
+      "",
+      "$TM_FILENAME_BASE.type = ControllerTypes.RETURN;",
+      "$TM_FILENAME_BASE.occasion = SessionStates.$1;",
+      "",
+      "export default $TM_FILENAME_BASE;"
+    ]
+  }
+}

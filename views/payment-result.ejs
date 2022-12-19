@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="stylesheet" href="styles/main.css" />
+    <link rel="stylesheet" href="styles/payment-result.css" />
+    <script src="scripts/index.js" defer></script>
+    <title>payment result</title>
+  </head>
+  <body>
+    <main class="container result">
+      <!-- Upper ________________________________________________________________________________ -->
+      <div class="result__upper">
+        <p class="result__upper__title">
+          <% if (status === "OK") { %> پرداخت شما موفقیت آمیز بود <% } else { %> پرداخت
+          شما ناموفق بود <% } %>
+        </p>
+        <i
+          class="<% if (status === "OK") { %> gg-check-r <% } else { %> gg-close-r <% } %> result__upper__icon"
+        ></i>
+      </div>
+      <!-- center ________________________________________________________________________________ -->
+      <% if (status === "OK" && order) { %>       
+        <div class="result__center">
+            <table class="result__center__table">
+              <tr class="result__center__table__tr">
+                <td class="result__center__table__tr__td">نام</td>
+                <td class="result__center__table__tr__td"><%= order.user.name %> </td>
+              </tr>
+              <tr class="result__center__table__tr">
+                <td class="result__center__table__tr__td">نوع نون</td>
+                <td class="result__center__table__tr__td"><%= order.breadType %> </td>
+              </tr>
+              <tr class="result__center__table__tr">
+                <td class="result__center__table__tr__td">تعداد</td>
+                <td class="result__center__table__tr__td"><%= order.amount %> </td>
+              </tr>
+              <tr class="result__center__table__tr">
+                <td class="result__center__table__tr__td">زمان تحویل</td>
+                <td class="result__center__table__tr__td"><%= order.time %> </td>
+              </tr>
+              <tr class="result__center__table__tr">
+                <td class="result__center__table__tr__td">تاریخ</td>
+                <td class="result__center__table__tr__td"><%= order.dateString %> </td>
+              </tr>
+              <tr class="result__center__table__tr">
+                <td class="result__center__table__tr__td">قیمت</td>
+                <td class="result__center__table__tr__td"><%= order.price %> </td>
+              </tr>
+              <tr class="result__center__table__tr">
+                <td class="result__center__table__tr__td">کد پیگیری</td>
+                <td class="result__center__table__tr__td"><%= response %> </td>
+              </tr>
+            </table>
+        </div>
+      <% } %>
+      <!-- below ________________________________________________________________________________ -->
+      <div class="result__footer">
+        <button id="returnBtn"class="result__footer__btn btn">بازگشت به نونشهرک</button>
+      </div>
+    </main>
+  </body>
+</html>
