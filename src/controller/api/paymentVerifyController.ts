@@ -27,6 +27,7 @@ const paymentVerifyController: RequestHandler<any, any, any, ReqQuery> =
       order.authority = "";
       order.refId = response;
       order.save();
+    } else {
     }
 
     res.render("payment-result", {

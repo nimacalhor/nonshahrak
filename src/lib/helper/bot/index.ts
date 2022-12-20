@@ -7,6 +7,7 @@ import { VALID_PHONE_LENGTH } from "@src/lib/constants/bot/general";
 import Keywords from "@src/lib/constants/bot/keywords";
 import { SessionStates } from "@src/lib/constants/bot/session";
 import { BreadPrices } from "@src/lib/constants/general";
+import Session from "@src/model/Session";
 import {
   Controller,
   ControllerResult,
@@ -14,35 +15,60 @@ import {
 } from "@src/types/controller";
 import { DailyOrderDoc } from "@src/types/dailyOrder";
 import { OrderDoc } from "@src/types/order";
+import { SessionDoc, SessionOrder, SessionOrderKeys } from "@src/types/session";
 import { TContext } from "@t/general-types";
 import { Document, Query } from "mongoose";
 
-type OrderKeys = keyof TContext["session"]["order"];
+type KeyType = SessionOrderKeys | SessionOrderKeys[];
 
-type KeyType = OrderKeys | {} | OrderKeys[];
+// ______________________________
 
-export const setOrderSession = (ctx: TContext, key: KeyType, value?: any) => {
-  if (typeof key === "string")
-    return (ctx.session.order[key as OrderKeys] = value);
-  if (Array.isArray(key) && key.length > 0)
-    return key.forEach((k) => (ctx.session.order[k as OrderKeys] = value));
-  ctx.session.order = {};
+export const setOrderSession = async (
+  userId: number | undefined,
+  key?: KeyType,
+  value?: any
+) => {
+  const session = (await Session.findOne({ userId })) as SessionDoc;
+  if (typeof key === "string") {
+    (session.order as any)[key] = value;
+    await session.save();
+    return session;
+  }
+  if (Array.isArray(key) && key.length > 0) {
+    key.forEach((k) => ((session.order as any)[k] = value));
+    await session.save();
+    return session;
+  }
+  session.order = { days: [] };
+  await session.save();
+  return session;
 };
+
+// ______________________________
 
 export const compareEnum = (
   text: string,
   ...enums: string[] | ButtonLabels[] | Keywords[] | (string | Keywords)[]
 ) => (enums as string[]).includes(text);
 
-export const isOrderTypeTomorrow = ({
-  session: {
-    order: { type },
-  },
-}: TContext) => compareEnum(type as string, ButtonLabels.ORDER_TYPE_TOMORROW);
+// ______________________________
+
+export const isOrderTypeTomorrow = async (userId: number | undefined) => {
+  const session = await Session.findOne().byUserId(userId);
+  if (!session || !session.order) return false;
+  return compareEnum(
+    session.order.type as string,
+    ButtonLabels.ORDER_TYPE_TOMORROW
+  );
+};
+
+// ______________________________
 
 export const getAllControllersArr = (
   ...modules: { [key: string]: Controller }[]
 ) => modules.map((m) => Object.values(m)).flat();
+
+// ______________________________
 
 export const validateCtxText = (ctx: TContext) => {
   if (!ctx.message) return false;
@@ -51,10 +77,7 @@ export const validateCtxText = (ctx: TContext) => {
   return text;
 };
 
-export const validateState = (ctx: TContext) => ctx.session?.state;
-
-export const setStateSession = (ctx: TContext, state: any) =>
-  (ctx.session.state = state);
+// ______________________________
 
 export const reply = (
   ctx: TContext,
@@ -62,22 +85,37 @@ export const reply = (
   reply_markup: ReplyMarkup
 ) => ctx.reply(message, { reply_markup });
 
+// ______________________________
+
 export const getControllerResult = (
   message: string,
   state: SessionStates,
   replyMarkup: ReplyMarkup
 ): ControllerResult => ({ message, state, replyMarkup });
 
+// ______________________________
+
 export const getUserId = (ctx: TContext) => {
   const id = ctx.message ? ctx.message.from?.id : ctx.from?.id;
   if (typeof id === "number") return parseInt(id + "");
   return id;
 };
+// ______________________________
+
 export const getUsername = (ctx: TContext) =>
   ctx.message ? ctx.message.from?.username : ctx.from?.username;
 
+// ______________________________
+
+export const getChatId = (ctx: TContext) =>
+  ctx.chat ? ctx.chat.id : ctx.message?.chat.id;
+
+// ______________________________
+
 export const isPhone = (phone: string) =>
   phone.trim().length === VALID_PHONE_LENGTH && phone.startsWith("09");
+
+// ______________________________
 
 export const calcPrice = (
   amount: number,
@@ -88,21 +126,12 @@ export const calcPrice = (
   else return BreadPrices.SANQAK * amount;
 };
 
+// ______________________________
+
 export const daysToIndex = (days: string[] = []) =>
   [...days].map((d) => INDEXED_PERSIAN_WEEKDAYS.indexOf(d));
 
-export const deleteSession = (ctx: TContext) =>
-  ((ctx.session as any) = undefined);
-
-export const getUserByIdQHelper = function <TDoc extends Document>() {
-  return function (
-    this: Query<TDoc[], TDoc>,
-    userId: number | undefined
-  ): Query<TDoc | null, TDoc> {
-    const query = this.findOne({ userId });
-    return query;
-  };
-};
+// ______________________________
 
 export const priceGetter = function (this: OrderDoc | DailyOrderDoc) {
   let price: number;
@@ -110,4 +139,12 @@ export const priceGetter = function (this: OrderDoc | DailyOrderDoc) {
     price = this.amount * BreadPrices.BARBARI;
   else price = this.amount * BreadPrices.SANQAK;
   return price;
+};
+
+// ______________________________
+
+export const validateState = async (ctx: TContext) => {
+  const session = await Session.findOne().byCtx(ctx);
+  if (!session) return false;
+  return session.state;
 };

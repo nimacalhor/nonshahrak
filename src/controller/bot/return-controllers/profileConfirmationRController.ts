@@ -1,6 +1,6 @@
 import { SessionStates } from "@constants/bot/session";
 import ControllerTypes from "@constants/controllerTypes";
-import { Controller } from "@t/controller";
+import { Controller, ReplyMarkup } from "@t/controller";
 import buttons from "@view/reply-markups";
 import {
   isOrderTypeTomorrow,
@@ -11,21 +11,20 @@ import {
 import OrderMessages from "@view/messages";
 import Session from "@src/model/Session";
 
-const weekdaysRController: Controller = async function (ctx) {
-  await setOrderSession(getUserId(ctx), "type", undefined);
-  await setOrderSession(getUserId(ctx), "days", []);
+const profileConfirmationRController: Controller = async function (ctx) {
+  await setOrderSession(getUserId(ctx), "time", undefined);
   const messages = new OrderMessages(
     await Session.find().byCtx(ctx),
     await isOrderTypeTomorrow(getUserId(ctx))
   );
   return getControllerResult(
-    messages.orderBread,
-    SessionStates.ENTERING_ORDER_TYPE,
-    buttons.orderTypeButtons
+    messages.enterTime(),
+    SessionStates.ENTERING_TIME,
+    buttons.enterTimeButtons
   );
 };
 
-weekdaysRController.type = ControllerTypes.RETURN;
-weekdaysRController.occasion = SessionStates.ENTERING_WEEK_DAYS;
+profileConfirmationRController.type = ControllerTypes.RETURN;
+profileConfirmationRController.occasion = SessionStates.PROFILE_CONFIRMATION;
 
-export default weekdaysRController;
+export default profileConfirmationRController;

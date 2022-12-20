@@ -5,6 +5,7 @@ import { END_WORK_HOUR, START_WORK_HOUR } from "@src/lib/constants/bot/general";
 import { User, UserDoc } from "@src/types/user";
 import ButtonLabels from "@src/lib/constants/bot/button-labels";
 import { BreadPrices } from "@src/lib/constants/general";
+import { SessionDoc } from "@src/types/session";
 
 const BOT_PROCESS_MESSAGE = "روند کاری بات";
 const ORDER_BREAD = "سفارش نون 🍞";
@@ -55,10 +56,10 @@ class OrderMessages {
     return this.addBreak(ORDER_BREAD + "\n\n" + CHOOSE_ORDER_TYPE);
   }
 
-  constructor(private ctx: TContext, tomorrow: boolean = false) {
+  constructor(private session: SessionDoc | null, tomorrow: boolean = false) {
     this.tomorrow = tomorrow;
-    if (!tomorrow && ctx.session?.order?.days)
-      this.weekdays = ctx.session.order.days;
+
+    if (!tomorrow && session?.order?.days) this.weekdays = session.order.days;
 
     if (!tomorrow) return;
     const { day, month, year, weekday } = getPersianDate(getTomorrowsDate());
@@ -189,8 +190,18 @@ class OrderMessages {
   }
 
   getOrderConfirmation(userData?: User) {
-    // const
-    // const data = userData ? {userData} : this.ctx.session.order;
+    const defaultOrder = {
+      type: "نا مشخص",
+      breadType: "نا مشخص",
+      amount: 1,
+      time: "نا مشخص",
+      name: "نا مشخص",
+      phone: "نا مشخص",
+      block: "نا مشخص",
+      entrance: "نا مشخص",
+      floor: "نا مشخض",
+      unit: "نا مشخص",
+    };
     const {
       type = "نا مشخص",
       breadType = "نا مشخص",
@@ -202,7 +213,7 @@ class OrderMessages {
       entrance = "نا مشخص",
       floor = "نا مشخض",
       unit = "نا مشخص",
-    } = this.ctx.session.order;
+    } = this.session?.order || defaultOrder;
     const data = {
       type,
       breadType,

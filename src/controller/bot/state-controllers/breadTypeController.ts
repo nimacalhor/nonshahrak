@@ -1,16 +1,17 @@
-import { getControllerResult, setOrderSession } from "@src/lib/helper/bot";
+import { getControllerResult, getUserId, setOrderSession } from "@src/lib/helper/bot";
 import { SessionStates } from "@constants/bot/session";
 import ControllerTypes from "@constants/controllerTypes";
-import { Controller, ReplyMarkup } from "@t/controller";
+import { Controller } from "@t/controller";
 import buttons from "@view/reply-markups";
 import { compareEnum, isOrderTypeTomorrow } from "@helper/bot";
 import OrderMessages from "@view/messages";
 import ButtonLabels from "@src/lib/constants/bot/button-labels";
 import AlertMessages from "@src/view/messages/AlertMessages";
+import Session from "@src/model/Session";
 
-const breadTypeController: Controller = function (ctx) {
+const breadTypeController: Controller = async function (ctx) {
   const entry = ctx.message?.text as string;
-  const messages = new OrderMessages(ctx, isOrderTypeTomorrow(ctx));
+  const messages = new OrderMessages(await Session.find().byCtx(ctx), await isOrderTypeTomorrow(getUserId(ctx)));
   if (!compareEnum(entry, ButtonLabels.BARBARI, ButtonLabels.SANAQAK))
     return getControllerResult(
       AlertMessages.chooseFromButtons,
@@ -18,7 +19,7 @@ const breadTypeController: Controller = function (ctx) {
       buttons.breadTypeButtons
     );
 
-  setOrderSession(ctx, "breadType", entry);
+  await setOrderSession(getUserId(ctx), "breadType", entry);
   return getControllerResult(
     messages.enterBreadAmount(),
     SessionStates.ENTERING_BREAD_AMOUNT,

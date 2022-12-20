@@ -10,3 +10,4 @@ export { default as entranceRController } from "./entranceRController";
 export { default as floorRController } from "./floorRController";
 export { default as unitRController } from "./unitRController";
 export { default as orderConfirmationRController } from "./orderConfirmationRController";
+export { default as profileConfirmationRController } from "./profileConfirmationRController";

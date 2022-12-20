@@ -1,7 +1,7 @@
-import { isPhone } from "./../../../lib/helper/bot/index";
+import { getUserId, isPhone } from "./../../../lib/helper/bot/index";
 import { SessionStates } from "@constants/bot/session";
 import ControllerTypes from "@constants/controllerTypes";
-import { Controller, ReplyMarkup } from "@t/controller";
+import { Controller } from "@t/controller";
 import buttons from "@view/reply-markups";
 import {
   isOrderTypeTomorrow,
@@ -11,10 +11,11 @@ import {
 import OrderMessages from "@view/messages";
 import { isNumber } from "@src/lib/helper";
 import AlertMessages from "@src/view/messages/AlertMessages";
+import Session from "@src/model/Session";
 
-const phoneController: Controller = function (ctx) {
+const phoneController: Controller = async function (ctx) {
   const entry = ctx.message?.text as string;
-  const messages = new OrderMessages(ctx, isOrderTypeTomorrow(ctx));
+  const messages = new OrderMessages(await Session.find().byCtx(ctx), await isOrderTypeTomorrow(getUserId(ctx)));
   const phoneNumber = ctx.message?.contact?.phone_number;
   const finalResult = getControllerResult(
     messages.getBlock(),
@@ -22,7 +23,7 @@ const phoneController: Controller = function (ctx) {
     buttons.enterBlock
   );
   if (phoneNumber) {
-    setOrderSession(ctx, "phone", phoneNumber);
+    await setOrderSession(getUserId(ctx), "phone", phoneNumber);
     return finalResult;
   }
   if (!isNumber(entry))
@@ -37,7 +38,7 @@ const phoneController: Controller = function (ctx) {
       SessionStates.ENTERING_PHONE,
       buttons.enterPhoneButtons
     );
-  setOrderSession(ctx, "phone", entry);
+  await setOrderSession(getUserId(ctx), "phone", entry);
   return finalResult;
 };
 

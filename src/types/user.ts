@@ -23,7 +23,7 @@ export interface UserQueryHelpers {
   byUserId(
     this: Query<any, UserDoc>,
     userId: number | undefined
-  ): QueryWithHelpers<User | null, UserDoc, UserQueryHelpers>;
+  ): QueryWithHelpers<UserDoc | null, UserDoc, UserQueryHelpers>;
 }
 export type UserModel = Model<User, UserQueryHelpers>;
 export type UserQuery = QueryWithHelpers<any, UserDoc, UserQueryHelpers>;

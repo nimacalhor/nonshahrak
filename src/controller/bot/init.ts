@@ -1,12 +1,12 @@
 import { SessionStates } from "./../../lib/constants/bot/session";
 import { TContext } from "@t/general-types";
-import Commands from "@src/lib/constants/bot/commands";
 import ControllerTypes from "@src/lib/constants/controllerTypes";
 import {
   compareEnum,
   getAllControllersArr,
+  getChatId,
+  getUserId,
   reply,
-  setStateSession,
   validateCtxText,
   validateState,
 } from "@src/lib/helper/bot";
@@ -18,6 +18,7 @@ import * as commandControllers from "./command-controllers";
 import * as keywordControllers from "./keyword-controllers";
 import * as stateControllers from "./state-controllers";
 import * as returnControllers from "./return-controllers";
+import Session from "@src/model/Session";
 
 type ControllerList = { [key: string]: Controller };
 type Mw = Middleware<TContext>;
@@ -51,7 +52,19 @@ allControllers.forEach((c) => {
 
 const runController = async (ctx: TContext, c: Controller) => {
   const { message, replyMarkup, state } = await c(ctx);
-  setStateSession(ctx, state);
+  const session = await Session.findOne({ userId: getUserId(ctx) });
+  if (session) {
+    if (compareEnum(state, SessionStates.UNDEFINED)) {
+      await session.remove();
+    } else {
+      session.state = state;
+      await session.save();
+    }
+  } else {
+    const userId = getUserId(ctx);
+    const chatId = getChatId(ctx);
+    await Session.create({ userId, chatId, state, order: {} });
+  }
   reply(ctx, message, replyMarkup);
 };
 
@@ -62,7 +75,7 @@ export const initCommands = (bot: Telegraf<TContext>) =>
 
 export const returnMw: Mw = async function (ctx, next) {
   const entry = validateCtxText(ctx);
-  const state = validateState(ctx);
+  const state = await validateState(ctx);
   if (!entry) return next();
   if (!state) return next();
   if (!compareEnum(entry, ButtonLabels.RETURN)) return next();
@@ -74,9 +87,9 @@ export const returnMw: Mw = async function (ctx, next) {
 export const stateMw: Mw = async function (ctx, next) {
   const entry = validateCtxText(ctx);
   const phoneNumber = ctx.message?.contact?.phone_number;
-  const state = validateState(ctx);
+  const state = await validateState(ctx);
   if (!entry && !phoneNumber) return next();
-  if (!state || state === "") return next();
+  if (!state || compareEnum(state, SessionStates.UNDEFINED)) return next();
   const controller = stateControllersList[state];
   if (!controller) return next();
   await runController(ctx, controller);

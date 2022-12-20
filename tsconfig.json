@@ -16,7 +16,7 @@
       "@view/*": ["view/*"]
     },
     "types": ["node"],
-    "sourceMap": true,
+    "sourceMap": false,
     "outDir": "./dist",
     "removeComments": true,
     "esModuleInterop": true,

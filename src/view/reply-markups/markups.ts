@@ -25,26 +25,26 @@ export const returnButton: KeyboardButton = {
   text: buttonLabels.RETURN,
 };
 
-const getButtonWeekdayText = (num: number, ctx: TContext) =>
-  `${ctx.session.order.days?.includes(PERSIAN_WEEKDAYS[num]) ? "حذف" : ""} ${
+const getButtonWeekdayText = (num: number, days: string[]) =>
+  `${days.includes(PERSIAN_WEEKDAYS[num]) ? "حذف" : ""} ${
     PERSIAN_WEEKDAYS[num]
   }`;
 
-export const chooseWeekdaysButtons = (ctx: TContext): ReplyMarkup => ({
+export const chooseWeekdaysButtons = (days: string[]): ReplyMarkup => ({
   resize_keyboard: true,
   selective: true,
   keyboard: [
     [
-      { text: getButtonWeekdayText(2, ctx) },
-      { text: getButtonWeekdayText(1, ctx) },
-      { text: getButtonWeekdayText(7, ctx) },
+      { text: getButtonWeekdayText(2, days) },
+      { text: getButtonWeekdayText(1, days) },
+      { text: getButtonWeekdayText(7, days) },
     ],
     [
-      { text: getButtonWeekdayText(5, ctx) },
-      { text: getButtonWeekdayText(4, ctx) },
-      { text: getButtonWeekdayText(3, ctx) },
+      { text: getButtonWeekdayText(5, days) },
+      { text: getButtonWeekdayText(4, days) },
+      { text: getButtonWeekdayText(3, days) },
     ],
-    [{ text: getButtonWeekdayText(6, ctx) }],
+    [{ text: getButtonWeekdayText(6, days) }],
     [returnButton, { text: buttonLabels.CONFIRM }],
   ],
 });

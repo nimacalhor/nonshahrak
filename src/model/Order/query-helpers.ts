@@ -1,4 +1,4 @@
-import { getUserByIdQHelper } from "@src/lib/helper/bot";
+import { getUserByIdQHelper } from "../query-helper-factory";
 import { getTomorrowsDate } from "@src/lib/helper/date-helper";
 import { OrderDoc } from "@src/types/order";
 import { Query, QueryWithHelpers } from "mongoose";

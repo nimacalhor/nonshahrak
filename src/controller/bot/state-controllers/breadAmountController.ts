@@ -1,16 +1,17 @@
-import { getControllerResult } from "./../../../lib/helper/bot/index";
+import { getControllerResult, getUserId } from "./../../../lib/helper/bot/index";
 import { SessionStates } from "@constants/bot/session";
 import ControllerTypes from "@constants/controllerTypes";
-import { Controller, ReplyMarkup } from "@t/controller";
+import { Controller } from "@t/controller";
 import buttons from "@view/reply-markups";
 import { isOrderTypeTomorrow, setOrderSession } from "@helper/bot";
 import OrderMessages from "@view/messages";
 import { isNumber } from "@src/lib/helper";
 import AlertMessages from "@src/view/messages/AlertMessages";
+import Session from "@src/model/Session";
 
-const breadAmountController: Controller = function (ctx) {
+const breadAmountController: Controller = async function (ctx) {
   const entry = ctx.message?.text as string;
-  const messages = new OrderMessages(ctx, isOrderTypeTomorrow(ctx));
+  const messages = new OrderMessages(await Session.find().byCtx(ctx), await isOrderTypeTomorrow(getUserId(ctx)));
 
   if (!isNumber(entry))
     return getControllerResult(
@@ -19,7 +20,7 @@ const breadAmountController: Controller = function (ctx) {
       buttons.breadAmountButtons
     );
 
-  setOrderSession(ctx, "amount", entry);
+  await setOrderSession(getUserId(ctx), "amount", entry);
   return getControllerResult(
     messages.enterTime(),
     SessionStates.ENTERING_TIME,

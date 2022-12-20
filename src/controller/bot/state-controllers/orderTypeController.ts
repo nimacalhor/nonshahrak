@@ -1,19 +1,20 @@
-import { isOrderTypeTomorrow, setOrderSession } from "@src/lib/helper/bot";
+import {
+  getControllerResult,
+  getUserId,
+  isOrderTypeTomorrow,
+  setOrderSession,
+} from "@src/lib/helper/bot";
 import ButtonLabels from "@src/lib/constants/bot/button-labels";
 import { SessionStates } from "@src/lib/constants/bot/session";
 import ControllerTypes from "@src/lib/constants/controllerTypes";
 import { compareEnum } from "@src/lib/helper/bot";
-import { Controller, ReplyMarkup } from "@src/types/controller";
+import { Controller } from "@src/types/controller";
 import OrderMessages from "@src/view/messages";
 import AlertMessages from "@src/view/messages/AlertMessages";
 import buttons from "@view/reply-markups";
+import Session from "@src/model/Session";
 
-const orderTypeController: Controller = function (ctx) {
-  let message: string = "";
-  let state: SessionStates = SessionStates.UNDEFINED;
-  let replyMarkup: ReplyMarkup = buttons.mainButtons;
-
-  const result = () => ({ message, state, replyMarkup });
+const orderTypeController: Controller = async function (ctx) {
   const entry = ctx.message?.text as string;
 
   if (
@@ -22,25 +23,30 @@ const orderTypeController: Controller = function (ctx) {
       ButtonLabels.ORDER_TYPE_DAILY,
       ButtonLabels.ORDER_TYPE_TOMORROW
     )
-  ) {
-    message = AlertMessages.chooseFromButtons;
-    replyMarkup = buttons.orderTypeButtons;
-    state = SessionStates.ENTERING_ORDER_TYPE;
-    return result();
-  }
-  setOrderSession(ctx, "type", entry);
-  const isTomorrow = isOrderTypeTomorrow(ctx);
-  const messages = new OrderMessages(ctx, isTomorrow);
+  )
+    return getControllerResult(
+      AlertMessages.chooseFromButtons,
+      SessionStates.ENTERING_ORDER_TYPE,
+      buttons.orderTypeButtons
+    );
 
-  message = isTomorrow ? messages.chooseBreadType() : messages.chooseWeekdays();
-  replyMarkup = isTomorrow
+  await setOrderSession(getUserId(ctx), "type", entry);
+  const isTomorrow = await isOrderTypeTomorrow(getUserId(ctx));
+  const messages = new OrderMessages(await Session.find().byCtx(ctx), isTomorrow);
+  const session = await Session.findOne().byUserId(getUserId(ctx));
+  const days: string[] = session ? session.order.days : [];
+
+  const message = isTomorrow
+    ? messages.chooseBreadType()
+    : messages.chooseWeekdays();
+  const replyMarkup = isTomorrow
     ? buttons.breadTypeButtons
-    : buttons.chooseWeekdaysButtons(ctx);
-  state = isTomorrow
+    : buttons.chooseWeekdaysButtons(days);
+  const state = isTomorrow
     ? SessionStates.ENTERING_BREAD_TYPE
     : SessionStates.ENTERING_WEEK_DAYS;
 
-  return result();
+  return getControllerResult(message, state, replyMarkup);
 };
 
 orderTypeController.type = ControllerTypes.STATE;

@@ -1,6 +1,6 @@
 import { SessionStates } from "@constants/bot/session";
 import ControllerTypes from "@constants/controllerTypes";
-import { Controller, ReplyMarkup } from "@t/controller";
+import { Controller } from "@t/controller";
 import buttons from "@view/reply-markups";
 import {
   isOrderTypeTomorrow,
@@ -14,10 +14,14 @@ import ButtonLabels from "@src/lib/constants/bot/button-labels";
 import AlertMessages from "@src/view/messages/AlertMessages";
 import User from "@src/model/User";
 import { User as TUser } from "@t/user";
+import Session from "@src/model/Session";
 
 const profileConfirmController: Controller = async function (ctx) {
   const entry = ctx.message?.text as string;
-  const messages = new OrderMessages(ctx, isOrderTypeTomorrow(ctx));
+  const messages = new OrderMessages(
+    await Session.find().byCtx(ctx),
+    await isOrderTypeTomorrow(getUserId(ctx))
+  );
   if (
     !compareEnum(
       entry,
@@ -40,7 +44,8 @@ const profileConfirmController: Controller = async function (ctx) {
       buttons.confirmOrderButtons
     );
 
-  await User.findByIdAndDelete(user._id);
+  await setOrderSession(getUserId(ctx), "enteringProfile", true);
+
   return getControllerResult(
     messages.enterName(),
     SessionStates.ENTERING_NAME,

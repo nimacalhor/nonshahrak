@@ -11,7 +11,7 @@ export interface Order {
   amount: number;
   time: string;
   user: ObjectId;
-  userId: string;
+  userId: number;
   price: number;
   date: Date;
   paid: boolean;

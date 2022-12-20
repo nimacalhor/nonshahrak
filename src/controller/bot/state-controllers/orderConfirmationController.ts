@@ -11,7 +11,6 @@ import {
   daysToIndex,
   getUserId,
   getUsername,
-  deleteSession,
 } from "@helper/bot";
 import OrderMessages from "@view/messages";
 import ButtonLabels from "@src/lib/constants/bot/button-labels";
@@ -19,15 +18,20 @@ import AlertMessages from "@src/view/messages/AlertMessages";
 import Order from "@src/model/Order";
 import User from "@src/model/User";
 import DailyOrder from "@src/model/DailyOrder";
-import { User as TUser } from "@t/user";
+import { User as TUser, UserDoc } from "@t/user";
+import Session from "@src/model/Session";
 
 const orderConfirmationController: Controller = async function (ctx) {
   const entry = ctx.message?.text as string;
-  const isTomorrow = isOrderTypeTomorrow(ctx);
-  const messages = new OrderMessages(ctx, isTomorrow);
+  const isTomorrow = await isOrderTypeTomorrow(getUserId(ctx));
+  const messages = new OrderMessages(
+    await Session.find().byCtx(ctx),
+    isTomorrow
+  );
+  const session = await Session.findOne().byUserId(getUserId(ctx));
 
   if (compareEnum(entry, ButtonLabels.CANCEL_ORDER)) {
-    (ctx.session as any) = undefined;
+    session && (await session.remove());
     return getControllerResult(
       messages.botProcessMessage,
       SessionStates.UNDEFINED,
@@ -35,12 +39,23 @@ const orderConfirmationController: Controller = async function (ctx) {
     );
   }
 
-  let user: TUser | null;
+  let user: TUser | null = null;
   const userId = getUserId(ctx);
   const userInDb = await User.findOne().byUserId(userId);
-  if (userInDb) user = userInDb;
-  else {
-    const { name, phone, block, entrance, floor, unit } = ctx.session.order;
+  // TODO error handling
+  if (!session || !session.order)
+    return getControllerResult(
+      messages.botProcessMessage,
+      SessionStates.UNDEFINED,
+      buttons.mainButtons
+    );
+
+  // setting user
+  if (userInDb) {
+    if (session.order.enteringProfile) userInDb.remove();
+    else user = userInDb;
+  } else {
+    const { name, phone, block, entrance, floor, unit } = session.order;
     const username = getUsername(ctx);
     user = await User.create({
       name,
@@ -56,16 +71,16 @@ const orderConfirmationController: Controller = async function (ctx) {
 
   // daily order
   if (!isTomorrow) {
-    const { days, breadType, amount, time } = ctx.session.order;
+    const { days, breadType, amount, time } = session.order;
     await DailyOrder.create({
       days: daysToIndex(days),
       breadType,
       amount,
       time,
-      user: user._id,
+      user: (user as UserDoc)._id,
       userId,
     });
-    deleteSession(ctx);
+    await session.remove();
     return getControllerResult(
       messages.orderSubmitted(),
       SessionStates.UNDEFINED,
@@ -74,7 +89,7 @@ const orderConfirmationController: Controller = async function (ctx) {
   }
 
   // tomorrow order
-  const { amount, breadType, time } = ctx.session.order;
+  const { amount, breadType, time } = session.order;
   const response = await paymentRequest(
     calcPrice(parseInt(amount as any), breadType as string)
   );
@@ -84,7 +99,7 @@ const orderConfirmationController: Controller = async function (ctx) {
       breadType,
       amount,
       time,
-      user: user._id,
+      user: (user as UserDoc)._id,
       authority: response.authority,
       userId,
     });

@@ -31,7 +31,6 @@
     "persian-date": "^1.1.0",
     "sass": "^1.57.0",
     "telegraf": "^3.38.0",
-    "telegraf-session-local": "^2.1.0",
     "zarinpal-checkout": "^0.2.7"
   }
 }

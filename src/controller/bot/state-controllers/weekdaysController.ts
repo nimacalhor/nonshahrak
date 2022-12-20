@@ -1,10 +1,11 @@
 import { SessionStates } from "@constants/bot/session";
 import ControllerTypes from "@constants/controllerTypes";
-import { Controller, ReplyMarkup } from "@t/controller";
+import { Controller } from "@t/controller";
 import buttons from "@view/reply-markups";
 import {
   compareEnum,
   getControllerResult,
+  getUserId,
   isOrderTypeTomorrow,
   setOrderSession,
 } from "@helper/bot";
@@ -15,41 +16,61 @@ import {
   PERSIAN_WEEKDAYS,
 } from "@src/lib/constants/date-constants";
 import AlertMessages from "@src/view/messages/AlertMessages";
+import { SessionDoc } from "@src/types/session";
+import Session from "@src/model/Session";
 
-const weekdaysController: Controller = function (ctx) {
+const weekdaysController: Controller = async function (ctx) {
   const entry = ctx.message?.text as string;
   const weekdays = PERSIAN_WEEKDAYS.filter((d) => d !== "_");
   const deleteWeekdays = DELETE_PERSIAN_WEEKDAYS;
+  let session: SessionDoc = (await Session.findOne().byUserId(
+    getUserId(ctx)
+  )) as SessionDoc;
 
   if (compareEnum(entry, ...weekdays)) {
-    setOrderSession(ctx, "days", [
-      ...new Set([...(ctx.session.order.days || []), entry]),
+    session = await setOrderSession(getUserId(ctx), "days", [
+      ...new Set([...(session.order.days || []), entry]),
     ]);
-    const messages = new OrderMessages(ctx, isOrderTypeTomorrow(ctx));
+    const messages = new OrderMessages(
+      await Session.find().byCtx(ctx),
+      await isOrderTypeTomorrow(getUserId(ctx))
+    );
     return getControllerResult(
       messages.daySelected(),
       SessionStates.ENTERING_WEEK_DAYS,
-      buttons.chooseWeekdaysButtons(ctx)
+      buttons.chooseWeekdaysButtons(session.order.days)
     );
   }
 
   if (compareEnum(entry, ...deleteWeekdays)) {
-    setOrderSession(
-      ctx,
+    session = await setOrderSession(
+      getUserId(ctx),
       "days",
-      [...(ctx.session.order.days || [])].filter(
+      [...(session.order.days || [])].filter(
         (d) => d !== entry.replace("حذف ", "")
       )
     );
-    const messages = new OrderMessages(ctx, isOrderTypeTomorrow(ctx));
+    const messages = new OrderMessages(
+      await Session.find().byCtx(ctx),
+      await isOrderTypeTomorrow(getUserId(ctx))
+    );
     return getControllerResult(
       messages.dayDeleted(),
       SessionStates.ENTERING_WEEK_DAYS,
-      buttons.chooseWeekdaysButtons(ctx)
+      buttons.chooseWeekdaysButtons(session.order.days)
     );
   }
   if (compareEnum(entry, ButtonLabels.CONFIRM)) {
-    const messages = new OrderMessages(ctx, isOrderTypeTomorrow(ctx));
+    if (session.order.days.length === 0)
+      return getControllerResult(
+        AlertMessages.noDaySelected,
+        SessionStates.ENTERING_WEEK_DAYS,
+        buttons.chooseWeekdaysButtons([])
+      );
+    const messages = new OrderMessages(
+      await Session.find().byCtx(ctx),
+      await isOrderTypeTomorrow(getUserId(ctx))
+    );
     return getControllerResult(
       messages.chooseBreadType(),
       SessionStates.ENTERING_BREAD_TYPE,
@@ -60,7 +81,7 @@ const weekdaysController: Controller = function (ctx) {
   return getControllerResult(
     AlertMessages.chooseFromButtons,
     SessionStates.ENTERING_WEEK_DAYS,
-    buttons.chooseWeekdaysButtons(ctx)
+    buttons.chooseWeekdaysButtons(session.order.days)
   );
 };
 

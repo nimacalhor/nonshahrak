@@ -21,7 +21,7 @@ const orderSchema = new mongoose.Schema<
     },
     amount: { type: Number },
     time: { type: String },
-    userId: { type: String, index: true },
+    userId: { type: Number, index: true },
     user: {
       ref: "User",
       type: mongoose.SchemaTypes.ObjectId,

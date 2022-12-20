@@ -10,9 +10,8 @@ dotenv.config({
 });
 
 import mongoose from "mongoose";
-import mainBot from "./main-bot";
+import mainBot from "./bot";
 import api from "./api";
-require("./api");
 
 const connectionString =
   process.env.NODE_ENV === "development"
