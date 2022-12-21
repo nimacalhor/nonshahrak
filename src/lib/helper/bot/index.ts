@@ -90,8 +90,9 @@ export const reply = (
 export const getControllerResult = (
   message: string,
   state: SessionStates,
-  replyMarkup: ReplyMarkup
-): ControllerResult => ({ message, state, replyMarkup });
+  replyMarkup: ReplyMarkup,
+  saveOnSession?: boolean
+): ControllerResult => ({ message, state, replyMarkup, saveOnSession });
 
 // ______________________________
 

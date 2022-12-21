@@ -40,7 +40,6 @@ const sessionOrderSchema = new mongoose.Schema<
   unit: { type: Number },
   days: { type: [String], default: [] },
   price: { type: Number },
-  enteringProfile: { type: Boolean, default: false },
 });
 
 const sessionSchema = new mongoose.Schema<SessionDoc, SessionModel>(
@@ -49,6 +48,8 @@ const sessionSchema = new mongoose.Schema<SessionDoc, SessionModel>(
     chatId: { type: Number },
     state: { type: String, default: SessionStates.UNDEFINED },
     order: { type: sessionOrderSchema },
+    paymentMessageId: { type: Number },
+    enteringProfile: { type: Boolean, default: false },
   },
   {
     query: { byUserId, byCtx },

@@ -12,8 +12,9 @@ import Order from "@src/model/Order";
 import Session from "@src/model/Session";
 
 const purchaseController: Controller = async function (ctx) {
+  const session = await Session.findOne().byCtx(ctx);
   const messages = new OrderMessages(
-    await Session.find().byCtx(ctx),
+    session,
     await isOrderTypeTomorrow(getUserId(ctx))
   );
   const order = await Order.findOne()
@@ -22,6 +23,8 @@ const purchaseController: Controller = async function (ctx) {
     .equals(false);
   order && order.remove();
 
+  const messageId = session?.paymentMessageId;
+  if (messageId) ctx.deleteMessage(messageId);
   return getControllerResult(
     messages.botProcessMessage,
     SessionStates.UNDEFINED,

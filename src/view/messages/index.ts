@@ -41,6 +41,8 @@ const ENTER_NUMBER = "لطفا یک عدد انتخاب کنید.";
 const ORDER_SUBMITTED = "سفارش شما ثبت شد ✅ \n";
 const CLICK_FOR_PAYMENT = "برای پرداخت گزینه زیر را انتخاب کنید .";
 const CHECK_MY_ORDERS_FOR_MORE = `شما می تواید از بخش ${buttonLabels.MY_ORDERS} سفارش های خود را مدیریت و پرداخت کنید .`;
+const PURCHASE_SUCCESS = "پرداخت موفقیت آمیز بود .";
+const PURCHASE_FAILED = "پرداخت ناموفق بود .";
 
 class OrderMessages {
   private tomorrow: boolean = false;
@@ -162,6 +164,11 @@ class OrderMessages {
           : `${CHECK_MY_ORDERS_FOR_MORE}`
       }`
     );
+  }
+
+  purchaseResult(success: boolean) {
+    if (success) return `${PURCHASE_SUCCESS}`;
+    else return `${PURCHASE_FAILED}`;
   }
 
   getProfileConfirmation(profileData: User) {

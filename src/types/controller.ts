@@ -16,6 +16,7 @@ export interface ControllerResult {
   state: SessionStates;
   message: string;
   replyMarkup: ReplyMarkup;
+  saveOnSession?: boolean;
 }
 export interface Controller extends Function {
   (ctx: TContext): Promise<ControllerResult> | ControllerResult;

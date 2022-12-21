@@ -52,7 +52,7 @@ const orderConfirmationController: Controller = async function (ctx) {
 
   // setting user
   if (userInDb) {
-    if (session.order.enteringProfile) userInDb.remove();
+    if (session.enteringProfile) userInDb.remove();
     else user = userInDb;
   } else {
     const { name, phone, block, entrance, floor, unit } = session.order;
@@ -90,11 +90,11 @@ const orderConfirmationController: Controller = async function (ctx) {
 
   // tomorrow order
   const { amount, breadType, time } = session.order;
+  ctx.reply("⏳ ...", { reply_markup: buttons.paymentButtons });
   const response = await paymentRequest(
     calcPrice(parseInt(amount as any), breadType as string)
   );
   if (response) {
-    ctx.reply("⏳ ...", { reply_markup: buttons.paymentButtons });
     await Order.create({
       breadType,
       amount,
@@ -106,7 +106,8 @@ const orderConfirmationController: Controller = async function (ctx) {
     return getControllerResult(
       messages.orderSubmitted(),
       SessionStates.PURCHASING_ORDER,
-      buttons.paymentLink(response.url)
+      buttons.paymentLink(response.url),
+      true
     );
   }
   return getControllerResult(

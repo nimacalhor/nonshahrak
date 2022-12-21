@@ -21,7 +21,7 @@ const nameRController: Controller = async function (ctx) {
   const session = (await Session.find().byCtx(ctx)) as SessionDoc;
   const user = await User.find().byUserId(session.userId);
   //
-  if (session.order.enteringProfile && user) {
+  if (session.enteringProfile && user) {
     //
     await setOrderSession(getUserId(ctx), "enteringProfile", false);
 

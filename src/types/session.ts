@@ -29,13 +29,14 @@ export interface SessionOrder {
   floor?: string;
   days: string[];
   price?: number;
-  enteringProfile: boolean;
 }
 export interface Session {
   userId: number;
   chatId: number;
   state: SessionStates;
   order: SessionOrder;
+  paymentMessageId?: number;
+  enteringProfile: boolean;
 }
 
 export type SessionOrderDoc = HydratedDocument<SessionOrder>;

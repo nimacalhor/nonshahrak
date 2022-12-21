@@ -51,7 +51,7 @@ allControllers.forEach((c) => {
 });
 
 const runController = async (ctx: TContext, c: Controller) => {
-  const { message, replyMarkup, state } = await c(ctx);
+  const { message, replyMarkup, state, saveOnSession } = await c(ctx);
   const session = await Session.findOne({ userId: getUserId(ctx) });
   if (session) {
     if (compareEnum(state, SessionStates.UNDEFINED)) {
@@ -65,7 +65,11 @@ const runController = async (ctx: TContext, c: Controller) => {
     const chatId = getChatId(ctx);
     await Session.create({ userId, chatId, state, order: {} });
   }
-  reply(ctx, message, replyMarkup);
+  const replyMessage = await reply(ctx, message, replyMarkup);
+  if (saveOnSession && session) {
+    session.paymentMessageId = replyMessage.message_id;
+    session.save();
+  }
 };
 
 export const initCommands = (bot: Telegraf<TContext>) =>

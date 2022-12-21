@@ -18,8 +18,9 @@ import Session from "@src/model/Session";
 
 const profileConfirmController: Controller = async function (ctx) {
   const entry = ctx.message?.text as string;
+  const session = await Session.find().byCtx(ctx);
   const messages = new OrderMessages(
-    await Session.find().byCtx(ctx),
+    session,
     await isOrderTypeTomorrow(getUserId(ctx))
   );
   if (
@@ -44,7 +45,10 @@ const profileConfirmController: Controller = async function (ctx) {
       buttons.confirmOrderButtons
     );
 
-  await setOrderSession(getUserId(ctx), "enteringProfile", true);
+  if (session) {
+    session.enteringProfile = true;
+    await session.save();
+  }
 
   return getControllerResult(
     messages.enterName(),
