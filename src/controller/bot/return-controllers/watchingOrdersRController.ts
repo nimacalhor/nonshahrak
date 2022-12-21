@@ -8,24 +8,15 @@ import {
   getUserId,
 } from "@helper/bot";
 import OrderMessages from "@view/messages";
-import Order from "@src/model/Order";
 import Session from "@src/model/Session";
 
-const purchaseController: Controller = async function (ctx) {
+const myOrdersController: Controller = async function (ctx) {
   const session = await Session.findOne().byCtx(ctx);
+  const userId = getUserId(ctx);
   const messages = new OrderMessages(
     session,
-    await isOrderTypeTomorrow(getUserId(ctx))
+    await isOrderTypeTomorrow(userId)
   );
-  const order = await Order.find()
-    .byUserId(getUserId(ctx))
-    .where("paid")
-    .equals(false)
-    .findOne();
-  order && order.remove();
-
-  const messageId = session?.paymentMessageId;
-  if (messageId) ctx.deleteMessage(messageId);
   return getControllerResult(
     messages.botProcessMessage,
     SessionStates.UNDEFINED,
@@ -33,7 +24,7 @@ const purchaseController: Controller = async function (ctx) {
   );
 };
 
-purchaseController.type = ControllerTypes.STATE;
-purchaseController.occasion = SessionStates.PURCHASING_ORDER;
+myOrdersController.type = ControllerTypes.RETURN;
+myOrdersController.occasion = SessionStates.WATCHING_ORDERS;
 
-export default purchaseController;
+export default myOrdersController;

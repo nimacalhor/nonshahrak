@@ -24,4 +24,4 @@ export const tomorrows = function (this: ThisType): ReturnType {
   return query;
 };
 
-export const byUserId = getUserByIdQHelper<OrderDoc>();
+export const byUserId = getUserByIdQHelper<OrderDoc, OrderDoc[]>();

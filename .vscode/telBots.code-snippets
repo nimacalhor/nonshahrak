@@ -1,45 +1,54 @@
 {
-  "tel bot controller": {
-    "prefix": "telbot",
-    "body": [
-      "import { SessionStates } from '@constants/bot/session';",
-      "import ControllerTypes from '@constants/controllerTypes';",
-      "import { Controller, ReplyMarkup } from '@t/controller';",
-      "import buttons from '@view/reply-markups'",
-      "import { isOrderTypeTomorrow, getControllerResult,setOrderSession } from '@helper/bot';",
-      "import OrderMessages from '@view/messages';",
-      "",
-      "const $TM_FILENAME_BASE: Controller = function (ctx) {",
-      "const entry = ctx.message?.text as string;",
-      "const messages = new OrderMessages(ctx, isOrderTypeTomorrow(ctx));",
-      "$3",
-      "};",
-      "",
-      "$TM_FILENAME_BASE.type = ControllerTypes.${1|COMMAND,KEYWORD,RETURN,STATE,QUERY|};",
-      "$TM_FILENAME_BASE.occasion = $2;",
-      "",
-      "export default $TM_FILENAME_BASE;"
-    ]
-  },
   "tel bot return controller": {
     "prefix": "telbotr",
     "body": [
       "import { SessionStates } from '@constants/bot/session';",
       "import ControllerTypes from '@constants/controllerTypes';",
-      "import { Controller, ReplyMarkup } from '@t/controller';",
+      "import { Controller } from '@t/controller';",
       "import buttons from '@view/reply-markups'",
-      "import { isOrderTypeTomorrow, getControllerResult,setOrderSession } from '@helper/bot';",
+      "import { isOrderTypeTomorrow, getControllerResult,setOrderSession, getUserId } from '@helper/bot';",
       "import OrderMessages from '@view/messages';",
+      "import Session from '@src/model/Session';",
       "",
-      "const $TM_FILENAME_BASE: Controller = function (ctx) {",
-      "const messages = new OrderMessages(ctx, isOrderTypeTomorrow(ctx));",
-      "$2",
+      "const myOrdersController: Controller = async function (ctx) {",
+      "   const entry = ctx.message?.text as string;",
+      "   const session = await Session.findOne().byCtx(ctx);",
+      "   const userId = getUserId(ctx);",
+      "   const messages = new OrderMessages(session, await isOrderTypeTomorrow(userId));",
+      "   $2",
       "};",
       "",
-      "$TM_FILENAME_BASE.type = ControllerTypes.RETURN;",
-      "$TM_FILENAME_BASE.occasion = SessionStates.$1;",
+      "myOrdersController.type = ControllerTypes.RETURN",
+      "myOrdersController.occasion = $1;",
       "",
-      "export default $TM_FILENAME_BASE;"
-    ]
+      "export default myOrdersController;"
+    ],
+    "description": "telegram controller"
+  },
+  "telegram controller": {
+    "prefix": "telbot",
+    "body": [
+      "import { SessionStates } from '@constants/bot/session';",
+      "import ControllerTypes from '@constants/controllerTypes';",
+      "import { Controller } from '@t/controller';",
+      "import buttons from '@view/reply-markups'",
+      "import { isOrderTypeTomorrow, getControllerResult,setOrderSession, getUserId } from '@helper/bot';",
+      "import OrderMessages from '@view/messages';",
+      "import Session from '@src/model/Session';",
+      "",
+      "const myOrdersController: Controller = async function (ctx) {",
+      "   const entry = ctx.message?.text as string;",
+      "   const session = await Session.findOne().byCtx(ctx);",
+      "   const userId = getUserId(ctx);",
+      "   const messages = new OrderMessages(session, await isOrderTypeTomorrow(userId));",
+      "   $3",
+      "};",
+      "",
+      "myOrdersController.type = ControllerTypes.${1|COMMAND,KEYWORD,RETURN,STATE,QUERY|};",
+      "myOrdersController.occasion = $2;",
+      "",
+      "export default myOrdersController;"
+    ],
+    "description": "telegram controller"
   }
 }

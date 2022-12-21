@@ -119,6 +119,7 @@ export const enterEntrance: ReplyMarkup = {
 export const enterPlaqueButtons = onlyReturnButton;
 export const enterFloorButtons = onlyReturnButton;
 export const enterUnitButtons = onlyReturnButton;
+export const myOrdersButtons = onlyReturnButton;
 
 export const confirmOrderButtons: ReplyMarkup = {
   resize_keyboard: true,

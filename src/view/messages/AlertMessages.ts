@@ -13,6 +13,7 @@ const ORDER_EXISTS = `شما از قبل سفارش TYPE دارید.
 سفارش جدید جایگزین سفارش قبلی شما میشود.
 از بخش ${ButtonLabels.MY_ORDERS} میتوانید سفارشات خود را مشاهده کنید.`;
 const TIME_INPUT_FORMAT_ERR = `فرمت ورودی صحیح نمی باشد ⚠`;
+const NO_SUBMITTED_ORDER = "شما هیچ سفارش ثبت شده ای ندارید ❕";
 
 class AlertMessages {
   readonly chooseFromButtons = CHOOSE_FROM_BUTTONS;
@@ -31,6 +32,7 @@ class AlertMessages {
     return ORDER_EXISTS.replace("TYPE", type);
   }
   readonly timeFormatError = TIME_INPUT_FORMAT_ERR;
+  readonly noSubmittedOrder = NO_SUBMITTED_ORDER;
 }
 
 export default new AlertMessages();

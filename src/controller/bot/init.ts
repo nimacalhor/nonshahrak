@@ -51,7 +51,9 @@ allControllers.forEach((c) => {
 });
 
 const runController = async (ctx: TContext, c: Controller) => {
-  const { message, replyMarkup, state, saveOnSession } = await c(ctx);
+  const result = await c(ctx);
+  if (!result) return;
+  const { message, replyMarkup, state, saveOnSession } = result;
   const session = await Session.findOne({ userId: getUserId(ctx) });
   if (session) {
     if (compareEnum(state, SessionStates.UNDEFINED)) {

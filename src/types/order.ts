@@ -28,9 +28,7 @@ export interface OrderVirtuals {
 export type OrderDoc = HydratedDocument<Order, {}, OrderVirtuals>;
 
 export interface OrderQueryHelpers {
-  byUserId(
-    userId: number | undefined
-  ): QueryWithHelpers<OrderDoc | null, OrderDoc>;
+  byUserId(userId: number | undefined): QueryWithHelpers<OrderDoc[], OrderDoc>;
   todays(): QueryWithHelpers<OrderDoc[], OrderDoc>;
   tomorrows(): QueryWithHelpers<OrderDoc[], OrderDoc>;
 }

@@ -6,6 +6,7 @@ import { User, UserDoc } from "@src/types/user";
 import ButtonLabels from "@src/lib/constants/bot/button-labels";
 import { BreadPrices } from "@src/lib/constants/general";
 import { SessionDoc } from "@src/types/session";
+import { OrderDoc } from "@src/types/order";
 
 const BOT_PROCESS_MESSAGE = "روند کاری بات";
 const ORDER_BREAD = "سفارش نون 🍞";
@@ -58,7 +59,10 @@ class OrderMessages {
     return this.addBreak(ORDER_BREAD + "\n\n" + CHOOSE_ORDER_TYPE);
   }
 
-  constructor(private session: SessionDoc | null, tomorrow: boolean = false) {
+  constructor(
+    private session: SessionDoc | null | undefined,
+    tomorrow: boolean = false
+  ) {
     this.tomorrow = tomorrow;
 
     if (!tomorrow && session?.order?.days) this.weekdays = session.order.days;
@@ -256,6 +260,11 @@ class OrderMessages {
     
     `
     );
+  }
+
+  getOrderString(order: OrderDoc) {
+    const { amount, breadType, dateString, time } = order;
+    return `${amount} نون ${breadType} برای ${dateString}، ساعت ${time}.`;
   }
 }
 

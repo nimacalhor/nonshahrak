@@ -19,7 +19,11 @@ export interface ControllerResult {
   saveOnSession?: boolean;
 }
 export interface Controller extends Function {
-  (ctx: TContext): Promise<ControllerResult> | ControllerResult;
+  (ctx: TContext):
+    | Promise<ControllerResult>
+    | ControllerResult
+    | Promise<undefined>
+    | undefined;
   occasion: SessionStates | ButtonLabels.RETURN | Commands | Keywords | Queries;
   type: ControllerTypes;
 }
