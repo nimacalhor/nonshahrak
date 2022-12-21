@@ -24,4 +24,10 @@ export const tomorrows = function (this: ThisType): ReturnType {
   return query;
 };
 
-export const byUserId = getUserByIdQHelper<OrderDoc, OrderDoc[]>();
+export const byUserId = function (
+  this: ThisType,
+  userId: number | undefined
+): ReturnType {
+  const query = this.find({ userId });
+  return query;
+};

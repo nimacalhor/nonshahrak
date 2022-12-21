@@ -28,7 +28,7 @@ export const setOrderSession = async (
   key?: KeyType,
   value?: any
 ) => {
-  const session = (await Session.findOne({ userId })) as SessionDoc;
+  const session = (await Session.find().byUserId(userId)) as SessionDoc;
   if (typeof key === "string") {
     (session.order as any)[key] = value;
     await session.save();
@@ -54,7 +54,7 @@ export const compareEnum = (
 // ______________________________
 
 export const isOrderTypeTomorrow = async (userId: number | undefined) => {
-  const session = await Session.findOne().byUserId(userId);
+  const session = await Session.find().byUserId(userId);
   if (!session || !session.order) return false;
   return compareEnum(
     session.order.type as string,
@@ -145,7 +145,7 @@ export const priceGetter = function (this: OrderDoc | DailyOrderDoc) {
 // ______________________________
 
 export const validateState = async (ctx: TContext) => {
-  const session = await Session.findOne().byCtx(ctx);
+  const session = await Session.find().byCtx(ctx);
   if (!session) return false;
   return session.state;
 };

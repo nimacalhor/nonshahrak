@@ -28,7 +28,7 @@ const orderConfirmationController: Controller = async function (ctx) {
     await Session.find().byCtx(ctx),
     isTomorrow
   );
-  const session = await Session.findOne().byUserId(getUserId(ctx));
+  const session = await Session.find().byUserId(getUserId(ctx));
 
   if (compareEnum(entry, ButtonLabels.CANCEL_ORDER)) {
     session && (await session.remove());
@@ -41,7 +41,7 @@ const orderConfirmationController: Controller = async function (ctx) {
 
   let user: TUser | null = null;
   const userId = getUserId(ctx);
-  const userInDb = await User.findOne().byUserId(userId);
+  const userInDb = await User.find().byUserId(userId);
   // TODO error handling
   if (!session || !session.order)
     return getControllerResult(

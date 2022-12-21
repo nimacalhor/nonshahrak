@@ -23,7 +23,7 @@ const weekdaysController: Controller = async function (ctx) {
   const entry = ctx.message?.text as string;
   const weekdays = PERSIAN_WEEKDAYS.filter((d) => d !== "_");
   const deleteWeekdays = DELETE_PERSIAN_WEEKDAYS;
-  let session: SessionDoc = (await Session.findOne().byUserId(
+  let session: SessionDoc = (await Session.find().byUserId(
     getUserId(ctx)
   )) as SessionDoc;
 

@@ -17,7 +17,7 @@ import Order from "@src/model/Order";
 
 const myOrdersController: Controller = async function (ctx) {
   const entry = ctx.message?.text as string;
-  const session = await Session.findOne().byCtx(ctx);
+  const session = await Session.find().byCtx(ctx);
   const userId = getUserId(ctx);
   const messages = new OrderMessages(
     session,

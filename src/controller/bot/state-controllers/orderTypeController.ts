@@ -32,8 +32,11 @@ const orderTypeController: Controller = async function (ctx) {
 
   await setOrderSession(getUserId(ctx), "type", entry);
   const isTomorrow = await isOrderTypeTomorrow(getUserId(ctx));
-  const messages = new OrderMessages(await Session.find().byCtx(ctx), isTomorrow);
-  const session = await Session.findOne().byUserId(getUserId(ctx));
+  const messages = new OrderMessages(
+    await Session.find().byCtx(ctx),
+    isTomorrow
+  );
+  const session = await Session.find().byUserId(getUserId(ctx));
   const days: string[] = session ? session.order.days : [];
 
   const message = isTomorrow

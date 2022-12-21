@@ -12,7 +12,7 @@ import Order from "@src/model/Order";
 import Session from "@src/model/Session";
 
 const purchaseController: Controller = async function (ctx) {
-  const session = await Session.findOne().byCtx(ctx);
+  const session = await Session.find().byCtx(ctx);
   const messages = new OrderMessages(
     session,
     await isOrderTypeTomorrow(getUserId(ctx))

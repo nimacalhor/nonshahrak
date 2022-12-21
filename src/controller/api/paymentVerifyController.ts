@@ -23,7 +23,7 @@ const paymentVerifyController: RequestHandler<any, any, any, ReqQuery> =
     }).populate("user");
 
     if (!order) return res.redirect("/404");
-    const session = await Session.findOne().byUserId(order.userId);
+    const session = await Session.find().byUserId(order.userId);
     if (!session) return res.redirect("/404");
 
     const response = await verifyPayment(
