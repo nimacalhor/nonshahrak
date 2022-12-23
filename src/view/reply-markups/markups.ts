@@ -6,6 +6,9 @@ import {
   ReplyKeyboardMarkup,
 } from "telegraf/typings/telegram-types";
 import { ReplyMarkup } from "@src/types/controller";
+import OrderMessages from "../messages";
+import { getDateMessage } from "@src/lib/helper/date-helper";
+import { divideArray } from "@src/lib/helper/bot";
 
 export const mainButtons: ReplyMarkup = {
   resize_keyboard: true,
@@ -18,6 +21,7 @@ export const mainButtons: ReplyMarkup = {
         text: buttonLabels.ORDER_BREAD,
       },
     ],
+    [{ text: buttonLabels.MY_DAILY_ORDERS }],
   ],
 };
 
@@ -144,3 +148,20 @@ export const paymentButtons: ReplyMarkup = {
   resize_keyboard: true,
   keyboard: [[{ text: buttonLabels.DONE }]],
 };
+
+const getDateButton = (date: Date, userId?: number) => ({
+  text: getDateMessage(date),
+  callback_data: `dailyOrder_${userId}_${date.getDay()}`,
+});
+
+export const dailyOrderButtons = (
+  dates: Date[],
+  userId: number | undefined
+): ReplyMarkup => ({
+  resize_keyboard: true,
+  inline_keyboard: divideArray(
+    dates.map((date) => getDateButton(date, userId))
+  ),
+});
+
+export const watchingDailyOrdersButtons = onlyReturnButton;

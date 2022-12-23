@@ -4,9 +4,10 @@ import {
   DailyOrderModel,
   DailyOrderQueryHelpers,
 } from "@src/types/dailyOrder";
-import mongoose, { Types } from "mongoose";
+import mongoose, { Schema, Types } from "mongoose";
 import { byUserId, inDay } from "./query-helpers";
-import { priceVirtual } from "./virtuals";
+import { dateStringVirtual } from "./virtuals";
+import { getDates } from "./methods";
 
 const dailyOrderSchema = new mongoose.Schema<
   DailyOrder,
@@ -17,7 +18,7 @@ const dailyOrderSchema = new mongoose.Schema<
   {
     days: { type: [Number], default: [] },
     amount: { type: Number },
-    breadType: { enum: [ButtonLabels.BARBARI, ButtonLabels.SANAQAK] },
+    breadType: { type: String },
     time: { type: String },
     user: {
       ref: "User",
@@ -27,8 +28,11 @@ const dailyOrderSchema = new mongoose.Schema<
   },
   {
     query: { byUserId, inDay },
-    virtual: { price: priceVirtual },
+    // virtuals: { dateString: dateStringVirtual },
+    methods: { getDates },
   }
 );
+
+dailyOrderSchema.virtual("dateString").get(dateStringVirtual.get);
 
 export default dailyOrderSchema;

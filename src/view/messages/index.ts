@@ -7,6 +7,7 @@ import ButtonLabels from "@src/lib/constants/bot/button-labels";
 import { BreadPrices } from "@src/lib/constants/general";
 import { SessionDoc } from "@src/types/session";
 import { OrderDoc } from "@src/types/order";
+import { DailyOrderDoc } from "@src/types/dailyOrder";
 
 const BOT_PROCESS_MESSAGE = "روند کاری بات";
 const ORDER_BREAD = "سفارش نون 🍞";
@@ -262,7 +263,7 @@ class OrderMessages {
     );
   }
 
-  getOrderString(order: OrderDoc) {
+  getOrderString(order: OrderDoc | DailyOrderDoc) {
     const { amount, breadType, dateString, time } = order;
     return `${amount} نون ${breadType} برای ${dateString}، ساعت ${time}.`;
   }

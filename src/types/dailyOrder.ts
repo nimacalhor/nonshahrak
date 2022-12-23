@@ -1,4 +1,10 @@
-import { HydratedDocument, Model, ObjectId, QueryWithHelpers } from "mongoose";
+import {
+  HydratedDocument,
+  Model,
+  ObjectId,
+  Query,
+  QueryWithHelpers,
+} from "mongoose";
 
 export interface DailyOrder {
   days: number[];
@@ -10,18 +16,33 @@ export interface DailyOrder {
   price: number;
 }
 
-export type DailyOrderDoc = HydratedDocument<DailyOrder>;
-
 export interface DailyOrderQueryHelpers {
   byUserId(
-    userId: number
-  ): QueryWithHelpers<DailyOrderDoc | null, DailyOrderDoc>;
-  inDay(day: number): QueryWithHelpers<DailyOrderDoc | null, DailyOrderDoc>;
+    this: Query<any, DailyOrderDoc>,
+    userId: number | undefined
+  ): Query<DailyOrderDoc | null, DailyOrderDoc>;
+  inDay(day: number): Query<DailyOrderDoc | null, DailyOrderDoc>;
 }
 
-export interface OrderVirtuals {
-  price: {
-    get(): number;
+export interface DailyOrderVirtuals {
+  dateString: {
+    get: () => string;
   };
 }
-export type DailyOrderModel = Model<DailyOrderDoc, {}, {}, OrderVirtuals>;
+
+export interface DailyOrderInstanceMethods {
+  getDates: () => Date[];
+}
+
+export type DailyOrderDoc = HydratedDocument<
+  DailyOrder,
+  DailyOrderInstanceMethods,
+  DailyOrderVirtuals
+>;
+
+export type DailyOrderModel = Model<
+  DailyOrderDoc,
+  DailyOrderQueryHelpers,
+  DailyOrderInstanceMethods,
+  DailyOrderVirtuals
+>;

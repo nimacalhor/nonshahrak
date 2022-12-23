@@ -1,4 +1,4 @@
-export const PERSIAN_WEEKDAYS = [
+export const  PERSIAN_WEEKDAYS = [
   "_",
   "یکشنبه",
   "دوشنبه",
@@ -40,3 +40,4 @@ export const WEEKDAYS = [
   "Friday",
   "Saturday",
 ];
+// export const INDEXED_WEEKDAYS = WEEKDAYS.filter()

@@ -23,7 +23,7 @@ const myOrdersController: Controller = async function (ctx) {
     session,
     await isOrderTypeTomorrow(userId)
   );
-  ctx.reply("⏳ ...", { reply_markup: buttons.myOrdersButtons });
+  ctx.reply("⏳ ...");
 
   const orders = await Order.find().byUserId(userId).where("paid").equals(true);
 
@@ -38,8 +38,8 @@ const myOrdersController: Controller = async function (ctx) {
     .forEach((order) => ctx.reply(messages.getOrderString(order)));
   return getControllerResult(
     messages.getOrderString(orders.slice(orders.length - 1)[0]),
-    SessionStates.WATCHING_ORDERS,
-    buttons.myOrdersButtons
+    SessionStates.UNDEFINED,
+    buttons.mainButtons
   );
 };
 

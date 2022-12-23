@@ -3,7 +3,10 @@ import {
   PERSIAN_WEEKDAYS,
 } from "@constants/date-constants";
 import ButtonLabels from "@src/lib/constants/bot/button-labels";
-import { VALID_PHONE_LENGTH } from "@src/lib/constants/bot/general";
+import {
+  DAILY_ORDER_ROW_BUTTON_AMOUNT,
+  VALID_PHONE_LENGTH,
+} from "@src/lib/constants/bot/general";
 import Keywords from "@src/lib/constants/bot/keywords";
 import { SessionStates } from "@src/lib/constants/bot/session";
 import { BreadPrices } from "@src/lib/constants/general";
@@ -130,17 +133,7 @@ export const calcPrice = (
 // ______________________________
 
 export const daysToIndex = (days: string[] = []) =>
-  [...days].map((d) => INDEXED_PERSIAN_WEEKDAYS.indexOf(d));
-
-// ______________________________
-
-export const priceGetter = function (this: OrderDoc | DailyOrderDoc) {
-  let price: number;
-  if ([ButtonLabels.BARBARI as string].includes(this.breadType))
-    price = this.amount * BreadPrices.BARBARI;
-  else price = this.amount * BreadPrices.SANQAK;
-  return price;
-};
+  [...days].map((d) => PERSIAN_WEEKDAYS.filter((d) => d !== "_").indexOf(d));
 
 // ______________________________
 
@@ -148,4 +141,16 @@ export const validateState = async (ctx: TContext) => {
   const session = await Session.find().byCtx(ctx);
   if (!session) return false;
   return session.state;
+};
+
+export const divideArray = function (
+  arr: any[],
+  chunkSize: number = DAILY_ORDER_ROW_BUTTON_AMOUNT
+) {
+  const resultArr = [];
+  for (let i = 0; i < arr.length; i += chunkSize) {
+    const chunk = arr.slice(i, i + chunkSize);
+    resultArr.push(chunk);
+  }
+  return resultArr;
 };
