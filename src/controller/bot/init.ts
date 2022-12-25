@@ -1,15 +1,6 @@
 import { SessionStates } from "./../../lib/constants/bot/session";
 import { TContext } from "@t/general-types";
 import ControllerTypes from "@src/lib/constants/controllerTypes";
-import {
-  compareEnum,
-  getAllControllersArr,
-  getChatId,
-  getUserId,
-  reply,
-  validateCtxText,
-  validateState,
-} from "@src/lib/helper/bot";
 import { Controller } from "@src/types/controller";
 import { Middleware, Telegraf } from "telegraf";
 import ButtonLabels from "@src/lib/constants/bot/button-labels";
@@ -18,7 +9,19 @@ import * as commandControllers from "./command-controllers";
 import * as keywordControllers from "./keyword-controllers";
 import * as stateControllers from "./state-controllers";
 import * as returnControllers from "./return-controllers";
+import * as queryControllers from "./query-controllers";
 import Session from "@src/model/Session";
+import {
+  compareEnum,
+  getAllControllersArr,
+  getChatId,
+  getQueryTitle,
+  getUserId,
+  reply,
+  validateCtxQueryData,
+  validateCtxText,
+  validateState,
+} from "@src/lib/helper/bot";
 
 type ControllerList = { [key: string]: Controller };
 type Mw = Middleware<TContext>;
@@ -33,7 +36,8 @@ const allControllers = getAllControllersArr(
   commandControllers,
   keywordControllers,
   stateControllers,
-  returnControllers
+  returnControllers,
+  queryControllers
 );
 
 allControllers.forEach((c) => {
@@ -106,6 +110,18 @@ export const keywordMw: Mw = async function (ctx, next) {
   if (!entry) return next();
   if (!compareEnum(entry, ...Object.values(Keywords))) return next();
   const controller = keywordControllersList[entry];
+  if (!controller) return next();
+  await runController(ctx, controller);
+};
+
+export const queryMw: Mw = async function (ctx, next) {
+  const queryData = validateCtxQueryData(ctx);
+  console.log({ queryData });
+  if (!queryData) return next();
+  const queryTitle = getQueryTitle(queryData);
+  if (!queryTitle) return next();
+  console.log({ queryTitle });
+  const controller = queryControllersList[queryTitle];
   if (!controller) return next();
   await runController(ctx, controller);
 };

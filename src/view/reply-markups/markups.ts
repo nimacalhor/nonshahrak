@@ -149,19 +149,22 @@ export const paymentButtons: ReplyMarkup = {
   keyboard: [[{ text: buttonLabels.DONE }]],
 };
 
-const getDateButton = (date: Date, userId?: number) => ({
+const getDateButton = (date: Date) => ({
   text: getDateMessage(date),
-  callback_data: `dailyOrder_${userId}_${date.getDay()}`,
+  callback_data: `dailyOrder_${date.getDay()}_${date.getTime()}`,
 });
 
-export const dailyOrderButtons = (
-  dates: Date[],
-  userId: number | undefined
-): ReplyMarkup => ({
+export const dailyOrderButtons = (dates: Date[]): ReplyMarkup => ({
   resize_keyboard: true,
-  inline_keyboard: divideArray(
-    dates.map((date) => getDateButton(date, userId))
-  ),
+  inline_keyboard: [
+    ...divideArray(dates.map(getDateButton)),
+    [
+      {
+        text: buttonLabels.PURCHASE_NEXT_WEEK,
+        callback_data: `dailyOrder_purchaseNextWeek`,
+      },
+    ],
+  ],
 });
 
 export const watchingDailyOrdersButtons = onlyReturnButton;

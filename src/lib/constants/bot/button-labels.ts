@@ -15,6 +15,7 @@ enum ButtonLabels {
   CONTINUE_WITH_THIS_INFO = "ثبت سفارش با این اطلاعات ✅",
   PAY = "پرداخت 💳",
   DONE = "انجام شد ✅",
+  PURCHASE_NEXT_WEEK = "پرداخت هفته آینده",
 }
 
 export default ButtonLabels;

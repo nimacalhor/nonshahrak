@@ -35,8 +35,8 @@ const myDailyOrdersController: Controller = async function (ctx) {
   const dates = dailyOrder.getDates();
   return getControllerResult(
     messages.getOrderString(dailyOrder),
-    SessionStates.WATCHING_DAILY_ORDERS,
-    buttons.dailyOrderButtons(dates, userId)
+    SessionStates.UNDEFINED,
+    buttons.dailyOrderButtons(dates)
   );
 };
 

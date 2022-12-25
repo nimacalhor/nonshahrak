@@ -8,6 +8,7 @@ import {
   VALID_PHONE_LENGTH,
 } from "@src/lib/constants/bot/general";
 import Keywords from "@src/lib/constants/bot/keywords";
+import Queries from "@src/lib/constants/bot/queries";
 import { SessionStates } from "@src/lib/constants/bot/session";
 import { BreadPrices } from "@src/lib/constants/general";
 import Session from "@src/model/Session";
@@ -78,6 +79,25 @@ export const validateCtxText = (ctx: TContext) => {
   const { text } = ctx.message;
   if (!text) return false;
   return text;
+};
+
+// ______________________________
+
+export const validateCtxQueryData = (ctx: TContext) => {
+  if (!ctx.callbackQuery) return false;
+  const { data } = ctx.callbackQuery;
+  if (!data) return false;
+  return data;
+};
+
+// ______________________________
+
+export const getQueryTitle = (query: string) => {
+  const matchResult = Object.values(Queries)
+    .join(" ")
+    .match(new RegExp(query, "gm"));
+  if (!matchResult) return false;
+  return matchResult[0];
 };
 
 // ______________________________

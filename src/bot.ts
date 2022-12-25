@@ -4,6 +4,7 @@ import {
   returnMw,
   stateMw,
   keywordMw,
+  queryMw,
 } from "./controller/bot/init";
 
 const token = process.env.MAIN_BOT_TOKEN as string;
@@ -15,6 +16,7 @@ initCommands(bot);
 bot.use(returnMw);
 bot.use(stateMw);
 bot.use(keywordMw);
+bot.use(queryMw);
 
 console.log("bot configured");
 export default bot;
