@@ -25,6 +25,7 @@ const dailyOrderSchema = new mongoose.Schema<
       type: Types.ObjectId,
     },
     userId: { type: Number },
+    duplicated: { type: Boolean, default: false },
   },
   {
     query: { byUserId, inDay },

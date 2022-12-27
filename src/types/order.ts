@@ -2,8 +2,8 @@ import {
   HydratedDocument,
   Model,
   ObjectId,
+  Query,
   QueryWithHelpers,
-  VirtualPathFunctions,
 } from "mongoose";
 
 export interface Order {
@@ -14,9 +14,13 @@ export interface Order {
   userId: number;
   price: number;
   date: Date;
+  day: number;
+  month: number;
+  year: number;
   paid: boolean;
   authority: string;
   refId: string | number;
+  duplicated: boolean;
 }
 
 export interface OrderVirtuals {
@@ -30,9 +34,8 @@ export type OrderDoc = HydratedDocument<Order, {}, OrderVirtuals>;
 export interface OrderQueryHelpers {
   byUserId(
     userId: number | undefined
-  ): QueryWithHelpers<OrderDoc[], OrderDoc>;
-  todays(): QueryWithHelpers<OrderDoc[], OrderDoc>;
-  tomorrows(): QueryWithHelpers<OrderDoc[], OrderDoc>;
+  ): QueryWithHelpers<OrderDoc[], OrderDoc, OrderQueryHelpers>;
+  tomorrows(): Query<OrderDoc[], OrderDoc>;
 }
 
 export type OrderModel = Model<OrderDoc, OrderQueryHelpers, {}, OrderVirtuals>;

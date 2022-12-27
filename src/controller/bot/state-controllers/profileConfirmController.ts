@@ -2,27 +2,17 @@ import { SessionStates } from "@constants/bot/session";
 import ControllerTypes from "@constants/controllerTypes";
 import { Controller } from "@t/controller";
 import buttons from "@view/reply-markups";
-import {
-  isOrderTypeTomorrow,
-  getControllerResult,
-  setOrderSession,
-  compareEnum,
-  getUserId,
-} from "@helper/bot";
+import { getControllerResult, compareEnum } from "@helper/bot";
 import OrderMessages from "@view/messages";
 import ButtonLabels from "@src/lib/constants/bot/button-labels";
 import AlertMessages from "@src/view/messages/AlertMessages";
 import User from "@src/model/User";
 import { User as TUser } from "@t/user";
-import Session from "@src/model/Session";
 
 const profileConfirmController: Controller = async function (ctx) {
-  const entry = ctx.message?.text as string;
-  const session = await Session.find().byCtx(ctx);
-  const messages = new OrderMessages(
-    session,
-    await isOrderTypeTomorrow(getUserId(ctx))
-  );
+  const entry = ctx.entry;
+  const session = ctx.session;
+  const messages = new OrderMessages(session, ctx.isTomorrow);
   if (
     !compareEnum(
       entry,
@@ -35,7 +25,7 @@ const profileConfirmController: Controller = async function (ctx) {
       SessionStates.PROFILE_CONFIRMATION,
       buttons.profileConfirmButtons
     );
-  const userId = getUserId(ctx);
+  const userId = ctx.userId;
   const user = (await User.find().byUserId(userId)) as TUser;
 
   if (compareEnum(entry, ButtonLabels.CONTINUE_WITH_THIS_INFO))

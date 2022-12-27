@@ -9,13 +9,13 @@ import {
   getUserId,
 } from "@helper/bot";
 import OrderMessages from "@view/messages";
-import Session from "@src/model/Session";
+
 
 const breadTypeRController: Controller = async function (ctx) {
-  await setOrderSession(getUserId(ctx), "breadType", undefined);
-  const isTomorrow = await isOrderTypeTomorrow(getUserId(ctx));
+  await setOrderSession(ctx, ctx.userId, "breadType", undefined);
+  const  isTomorrow = ctx.isTomorrow;
   if (isTomorrow) {
-    await setOrderSession(getUserId(ctx), "type", undefined);
+    await setOrderSession(ctx, ctx.userId, "type", undefined);
     const messages = new OrderMessages(await Session.find().byCtx(ctx), isTomorrow);
     return getControllerResult(
       messages.orderBread,
@@ -24,7 +24,7 @@ const breadTypeRController: Controller = async function (ctx) {
     );
   }
   const messages = new OrderMessages(await Session.find().byCtx(ctx), isTomorrow);
-  const session = await setOrderSession(getUserId(ctx), "days", []);
+  const session = await setOrderSession(ctx, ctx.userId, "days", []);
   const days = session ? session.order.days : [];
   return getControllerResult(
     messages.chooseWeekdays(),

@@ -12,18 +12,19 @@ import OrderMessages from "@view/messages";
 import { checkTextLength } from "@src/lib/helper";
 import { MAX_NAME_LENGTH } from "@src/lib/constants/bot/general";
 import AlertMessages from "@src/view/messages/AlertMessages";
-import Session from "@src/model/Session";
+
 
 const nameController: Controller = async function (ctx) {
-  const entry = ctx.message?.text as string;
-  const messages = new OrderMessages(await Session.find().byCtx(ctx), await isOrderTypeTomorrow(getUserId(ctx)));
+  const entry = ctx.entry;
+  const messages = new OrderMessages(ctx.session, ctx.isTomorrow)
+
   if (!checkTextLength(entry, MAX_NAME_LENGTH))
     return getControllerResult(
       AlertMessages.longEntry,
       SessionStates.ENTERING_NAME,
       buttons.enterNameButtons
     );
-  await setOrderSession(getUserId(ctx), "name", entry.trim());
+  await setOrderSession(ctx, ctx.userId, "name", entry.trim());
   return getControllerResult(
     messages.enterPhone(),
     SessionStates.ENTERING_PHONE,

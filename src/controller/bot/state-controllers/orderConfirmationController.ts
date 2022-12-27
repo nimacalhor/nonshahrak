@@ -19,16 +19,13 @@ import Order from "@src/model/Order";
 import User from "@src/model/User";
 import DailyOrder from "@src/model/DailyOrder";
 import { User as TUser, UserDoc } from "@t/user";
-import Session from "@src/model/Session";
+import { getTomorrowsDate } from "@src/lib/helper/date-helper";
 
 const orderConfirmationController: Controller = async function (ctx) {
-  const entry = ctx.message?.text as string;
-  const isTomorrow = await isOrderTypeTomorrow(getUserId(ctx));
-  const messages = new OrderMessages(
-    await Session.find().byCtx(ctx),
-    isTomorrow
-  );
-  const session = await Session.find().byUserId(getUserId(ctx));
+  const entry = ctx.entry;
+  const isTomorrow = ctx.isTomorrow;
+  const messages = new OrderMessages(ctx.session, isTomorrow);
+  const session = ctx.session;
 
   if (compareEnum(entry, ButtonLabels.CANCEL_ORDER)) {
     session && (await session.remove());
@@ -40,7 +37,7 @@ const orderConfirmationController: Controller = async function (ctx) {
   }
 
   let user: TUser | null = null;
-  const userId = getUserId(ctx);
+  const userId = ctx.userId;
   const userInDb = await User.find().byUserId(userId);
   // TODO error handling
   if (!session || !session.order)
@@ -72,15 +69,24 @@ const orderConfirmationController: Controller = async function (ctx) {
   // daily order
   if (!isTomorrow) {
     const { days, breadType, amount, time } = session.order;
-    await DailyOrder.create({
-      days: daysToIndex(days),
-      breadType,
-      amount,
-      time,
-      user: (user as UserDoc)._id,
-      userId,
-    });
-    await session.remove();
+    const dailyOrderToReplace = await DailyOrder.find().byUserId(userId);
+    let dailyOrderToReplaceSavePromise: Promise<any> = Promise.resolve();
+    if (dailyOrderToReplace) {
+      dailyOrderToReplace.duplicated = true;
+      dailyOrderToReplaceSavePromise = dailyOrderToReplace.save();
+    }
+    await Promise.all([
+      dailyOrderToReplaceSavePromise,
+      DailyOrder.create({
+        days: daysToIndex(days),
+        breadType,
+        amount,
+        time,
+        user: (user as UserDoc)._id,
+        userId,
+      }),
+      session.remove(),
+    ]);
     return getControllerResult(
       messages.orderSubmitted(),
       SessionStates.UNDEFINED,
@@ -95,14 +101,27 @@ const orderConfirmationController: Controller = async function (ctx) {
     calcPrice(parseInt(amount as any), breadType as string)
   );
   if (response) {
-    await Order.create({
-      breadType,
-      amount,
-      time,
-      user: (user as UserDoc)._id,
-      authority: response.authority,
+    const tmrDate = getTomorrowsDate();
+    const ordersToReplace = await Order.find({
       userId,
+      day: tmrDate.getDate(),
+      month: tmrDate.getMonth(),
     });
+    await Promise.all([
+      ...ordersToReplace.map((doc) => {
+        doc.duplicated = true;
+        return doc.save();
+      }),
+      Order.create({
+        breadType,
+        amount,
+        time,
+        user: (user as UserDoc)._id,
+        authority: response.authority,
+        userId,
+      }),
+    ]);
+
     return getControllerResult(
       messages.orderSubmitted(),
       SessionStates.PURCHASING_ORDER,

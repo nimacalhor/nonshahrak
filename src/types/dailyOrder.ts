@@ -14,6 +14,7 @@ export interface DailyOrder {
   user: ObjectId;
   userId: number;
   price: number;
+  duplicated: boolean;
 }
 
 export interface DailyOrderQueryHelpers {

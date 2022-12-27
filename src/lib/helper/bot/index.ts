@@ -28,6 +28,7 @@ type KeyType = SessionOrderKeys | SessionOrderKeys[];
 // ______________________________
 
 export const setOrderSession = async (
+  ctx: TContext,
   userId: number | undefined,
   key?: KeyType,
   value?: any
@@ -35,16 +36,31 @@ export const setOrderSession = async (
   const session = (await Session.find().byUserId(userId)) as SessionDoc;
   if (typeof key === "string") {
     (session.order as any)[key] = value;
-    await session.save();
+    const newSession = await session.save();
+    ctx.session = newSession;
+    ctx.isTomorrow = compareEnum(
+      newSession.order.type as string,
+      ButtonLabels.ORDER_TYPE_TOMORROW
+    );
     return session;
   }
   if (Array.isArray(key) && key.length > 0) {
     key.forEach((k) => ((session.order as any)[k] = value));
-    await session.save();
+    const newSession = await session.save();
+    ctx.session = newSession;
+    ctx.isTomorrow = compareEnum(
+      newSession.order.type as string,
+      ButtonLabels.ORDER_TYPE_TOMORROW
+    );
     return session;
   }
   session.order = { days: [] };
-  await session.save();
+  const newSession = await session.save();
+  ctx.session = newSession;
+  ctx.isTomorrow = compareEnum(
+    newSession.order.type as string,
+    ButtonLabels.ORDER_TYPE_TOMORROW
+  );
   return session;
 };
 
@@ -92,10 +108,9 @@ export const validateCtxQueryData = (ctx: TContext) => {
 
 // ______________________________
 
-export const getQueryTitle = (query: string) => {
-  const matchResult = Object.values(Queries)
-    .join(" ")
-    .match(new RegExp(query, "gm"));
+export const getQueryTitle = (query: string | false) => {
+  if (!query) return false;
+  const matchResult = query.match(Object.values(Queries).join(" "));
   if (!matchResult) return false;
   return matchResult[0];
 };

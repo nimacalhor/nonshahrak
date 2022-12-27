@@ -9,11 +9,11 @@ import {
   getUserId,
 } from "@helper/bot";
 import OrderMessages from "@view/messages";
-import Session from "@src/model/Session";
+
 
 const unitRController: Controller = async function (ctx) {
-  const messages = new OrderMessages(await Session.find().byCtx(ctx), await isOrderTypeTomorrow(getUserId(ctx)));
-  await setOrderSession(getUserId(ctx), ["unit", "floor"], undefined);
+  const messages = new OrderMessages(ctx.session, ctx.isTomorrow)
+  await setOrderSession(ctx, ctx.userId, ["unit", "floor"], undefined);
   return getControllerResult(
     messages.getFloorLevel(),
     SessionStates.ENTERING_FLOOR_LEVEL,

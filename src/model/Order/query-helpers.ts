@@ -1,25 +1,18 @@
-import { getUserByIdQHelper } from "../query-helper-factory";
 import { getTomorrowsDate } from "@src/lib/helper/date-helper";
 import { OrderDoc } from "@src/types/order";
+import { OrderQueryHelpers } from "@src/types/session";
 import { Query, QueryWithHelpers } from "mongoose";
 
-type ThisType = Query<OrderDoc[], OrderDoc>;
-type ReturnType = ThisType;
-
-export const todays = function (this: ThisType): ReturnType {
-  const todaysDate = new Date();
-  const weekday = todaysDate.getDay();
-  const query = this.find({
-    days: weekday,
-  });
-  return query;
-};
+type ThisType = Query<OrderDoc[], OrderDoc, OrderQueryHelpers>;
+type ReturnType = QueryWithHelpers<OrderDoc[], OrderDoc, OrderQueryHelpers>;
 
 export const tomorrows = function (this: ThisType): ReturnType {
   const tomorrowsDate = getTomorrowsDate();
-  const tomorrowsWeekday = tomorrowsDate.getDay();
+  const tomorrowsDay = tomorrowsDate.getDate();
+  const month = tomorrowsDate.getMonth();
   const query = this.find({
-    days: tomorrowsWeekday,
+    day: tomorrowsDay,
+    month,
   });
   return query;
 };

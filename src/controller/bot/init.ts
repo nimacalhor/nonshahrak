@@ -15,15 +15,11 @@ import {
   compareEnum,
   getAllControllersArr,
   getChatId,
-  getQueryTitle,
   getUserId,
   reply,
-  validateCtxQueryData,
-  validateCtxText,
-  validateState,
 } from "@src/lib/helper/bot";
 
-type ControllerList = { [key: string]: Controller };
+export type ControllerList = { [key: string]: Controller };
 type Mw = Middleware<TContext>;
 
 const commandControllersList: ControllerList = {};
@@ -40,21 +36,22 @@ const allControllers = getAllControllersArr(
   queryControllers
 );
 
-allControllers.forEach((c) => {
-  const { type, occasion } = c;
-  if (compareEnum(type, ControllerTypes.COMMAND))
-    commandControllersList[occasion] = c;
-  if (compareEnum(type, ControllerTypes.KEYWORD))
-    keywordControllersList[occasion] = c;
-  if (compareEnum(type, ControllerTypes.QUERY))
-    queryControllersList[occasion] = c;
-  if (compareEnum(type, ControllerTypes.RETURN))
-    returnControllersList[occasion] = c;
-  if (compareEnum(type, ControllerTypes.STATE))
-    stateControllersList[occasion] = c;
-});
+const initControllers = () =>
+  allControllers.forEach((c) => {
+    const { type, occasion } = c;
+    if (compareEnum(type, ControllerTypes.COMMAND))
+      commandControllersList[occasion] = c;
+    if (compareEnum(type, ControllerTypes.KEYWORD))
+      keywordControllersList[occasion] = c;
+    if (compareEnum(type, ControllerTypes.QUERY))
+      queryControllersList[occasion] = c;
+    if (compareEnum(type, ControllerTypes.RETURN))
+      returnControllersList[occasion] = c;
+    if (compareEnum(type, ControllerTypes.STATE))
+      stateControllersList[occasion] = c;
+  });
 
-const runController = async (ctx: TContext, c: Controller) => {
+export const runController = async (ctx: TContext, c: Controller) => {
   const result = await c(ctx);
   if (!result) return;
   const { message, replyMarkup, state, saveOnSession } = result;
@@ -78,50 +75,25 @@ const runController = async (ctx: TContext, c: Controller) => {
   }
 };
 
-export const initCommands = (bot: Telegraf<TContext>) =>
+const initCommands = (bot: Telegraf<TContext>) =>
   Object.entries(commandControllersList).forEach(([command, controller]) =>
     bot.command(command, (ctx: TContext) => runController(ctx, controller))
   );
 
-export const returnMw: Mw = async function (ctx, next) {
-  const entry = validateCtxText(ctx);
-  const state = await validateState(ctx);
-  if (!entry) return next();
-  if (!state) return next();
-  if (!compareEnum(entry, ButtonLabels.RETURN)) return next();
-  const controller = returnControllersList[state];
-  if (!controller) return next();
-  await runController(ctx, controller);
+type InitReturnType = {
+  keywordControllersList: ControllerList;
+  returnControllersList: ControllerList;
+  stateControllersList: ControllerList;
+  queryControllersList: ControllerList;
 };
 
-export const stateMw: Mw = async function (ctx, next) {
-  const entry = validateCtxText(ctx);
-  const phoneNumber = ctx.message?.contact?.phone_number;
-  const state = await validateState(ctx);
-  if (!entry && !phoneNumber) return next();
-  if (!state || compareEnum(state, SessionStates.UNDEFINED)) return next();
-  const controller = stateControllersList[state];
-  if (!controller) return next();
-  await runController(ctx, controller);
-};
-
-export const keywordMw: Mw = async function (ctx, next) {
-  const entry = validateCtxText(ctx);
-  if (!entry) return next();
-  if (!compareEnum(entry, ...Object.values(Keywords))) return next();
-  const controller = keywordControllersList[entry];
-  if (!controller) return next();
-  await runController(ctx, controller);
-};
-
-export const queryMw: Mw = async function (ctx, next) {
-  const queryData = validateCtxQueryData(ctx);
-  console.log({ queryData });
-  if (!queryData) return next();
-  const queryTitle = getQueryTitle(queryData);
-  if (!queryTitle) return next();
-  console.log({ queryTitle });
-  const controller = queryControllersList[queryTitle];
-  if (!controller) return next();
-  await runController(ctx, controller);
+export const init = function (bot: Telegraf<TContext>): InitReturnType {
+  initControllers();
+  initCommands(bot);
+  return new (class {
+    readonly keywordControllersList = keywordControllersList;
+    readonly returnControllersList = returnControllersList;
+    readonly stateControllersList = stateControllersList;
+    readonly queryControllersList = queryControllersList;
+  })();
 };

@@ -23,7 +23,8 @@ export interface Controller extends Function {
     | Promise<ControllerResult>
     | ControllerResult
     | Promise<undefined>
-    | undefined;
+    | undefined
+    | Promise<ControllerResult | undefined>;
   occasion: SessionStates | ButtonLabels.RETURN | Commands | Keywords | Queries;
   type: ControllerTypes;
 }

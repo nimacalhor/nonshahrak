@@ -9,14 +9,11 @@ import {
   getUserId,
 } from "@helper/bot";
 import OrderMessages from "@view/messages";
-import Session from "@src/model/Session";
+
 
 const profileConfirmationRController: Controller = async function (ctx) {
-  await setOrderSession(getUserId(ctx), "time", undefined);
-  const messages = new OrderMessages(
-    await Session.find().byCtx(ctx),
-    await isOrderTypeTomorrow(getUserId(ctx))
-  );
+  await setOrderSession(ctx, ctx.userId, "time", undefined);
+const messages = new OrderMessages(ctx.session, ctx.isTomorrow)
   return getControllerResult(
     messages.enterTime(),
     SessionStates.ENTERING_TIME,

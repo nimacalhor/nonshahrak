@@ -17,23 +17,21 @@ import {
 } from "@src/lib/constants/date-constants";
 import AlertMessages from "@src/view/messages/AlertMessages";
 import { SessionDoc } from "@src/types/session";
-import Session from "@src/model/Session";
+
 
 const weekdaysController: Controller = async function (ctx) {
-  const entry = ctx.message?.text as string;
+  const entry = ctx.entry;
   const weekdays = PERSIAN_WEEKDAYS.filter((d) => d !== "_");
   const deleteWeekdays = DELETE_PERSIAN_WEEKDAYS;
-  let session: SessionDoc = (await Session.find().byUserId(
-    getUserId(ctx)
-  )) as SessionDoc;
+  let session: SessionDoc = ctx.session;
 
   if (compareEnum(entry, ...weekdays)) {
-    session = await setOrderSession(getUserId(ctx), "days", [
+    session = await setOrderSession(ctx, ctx.userId, "days", [
       ...new Set([...(session.order.days || []), entry]),
     ]);
     const messages = new OrderMessages(
       await Session.find().byCtx(ctx),
-      await isOrderTypeTomorrow(getUserId(ctx))
+      ctx.isTomorrow
     );
     return getControllerResult(
       messages.daySelected(),
@@ -43,8 +41,8 @@ const weekdaysController: Controller = async function (ctx) {
   }
 
   if (compareEnum(entry, ...deleteWeekdays)) {
-    session = await setOrderSession(
-      getUserId(ctx),
+    session = await setOrderSession(ctx, 
+      ctx.userId,
       "days",
       [...(session.order.days || [])].filter(
         (d) => d !== entry.replace("حذف ", "")
@@ -52,7 +50,7 @@ const weekdaysController: Controller = async function (ctx) {
     );
     const messages = new OrderMessages(
       await Session.find().byCtx(ctx),
-      await isOrderTypeTomorrow(getUserId(ctx))
+      ctx.isTomorrow
     );
     return getControllerResult(
       messages.dayDeleted(),
@@ -69,7 +67,7 @@ const weekdaysController: Controller = async function (ctx) {
       );
     const messages = new OrderMessages(
       await Session.find().byCtx(ctx),
-      await isOrderTypeTomorrow(getUserId(ctx))
+      ctx.isTomorrow
     );
     return getControllerResult(
       messages.chooseBreadType(),

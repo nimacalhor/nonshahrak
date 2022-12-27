@@ -1,16 +1,12 @@
 import Commands from "@src/lib/constants/bot/commands";
 import { SessionStates } from "@src/lib/constants/bot/session";
 import ControllerTypes from "@src/lib/constants/controllerTypes";
-import { getUserId, isOrderTypeTomorrow } from "@src/lib/helper/bot";
-import Session from "@src/model/Session";
 import { Controller } from "@src/types/controller";
 import OrderMessages from "@src/view/messages";
 import buttons from "@view/reply-markups";
 
 const startController: Controller = async function (ctx) {
-  const isTomorrow = await isOrderTypeTomorrow(getUserId(ctx));
-  const message = new OrderMessages(await Session.find().byCtx(ctx), isTomorrow)
-    .botProcessMessage;
+  const message = new OrderMessages(null, false).botProcessMessage;
 
   return {
     message,

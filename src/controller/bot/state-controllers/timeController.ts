@@ -12,10 +12,9 @@ import OrderMessages from "@view/messages";
 import { END_WORK_HOUR, START_WORK_HOUR } from "@src/lib/constants/bot/general";
 import AlertMessages from "@src/view/messages/AlertMessages";
 import User from "@src/model/User";
-import Session from "@src/model/Session";
 
 const timeController: Controller = async function (ctx) {
-  const entry = ctx.message?.text as string;
+  const entry = ctx.entry;
   const hour = parseInt(entry);
   if (isNaN(hour))
     return getControllerResult(
@@ -29,9 +28,9 @@ const timeController: Controller = async function (ctx) {
       SessionStates.ENTERING_TIME,
       buttons.enterTimeButtons
     );
-  await setOrderSession(getUserId(ctx), "time", entry);
-  const messages = new OrderMessages(await Session.find().byCtx(ctx), await isOrderTypeTomorrow(getUserId(ctx)));
-  const userId = getUserId(ctx);
+  await setOrderSession(ctx, ctx.userId, "time", entry);
+  const messages = new OrderMessages(ctx.session, ctx.isTomorrow)
+  const userId = ctx.userId;
   const user = await User.find().byUserId(userId);
   if (!user)
     return getControllerResult(

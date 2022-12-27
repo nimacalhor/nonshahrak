@@ -50,6 +50,7 @@ const sessionSchema = new mongoose.Schema<SessionDoc, SessionModel>(
     order: { type: sessionOrderSchema },
     paymentMessageId: { type: Number },
     enteringProfile: { type: Boolean, default: false },
+    thereIsPaymentMessage: { type: Boolean, default: false },
   },
   {
     query: { byUserId, byCtx },

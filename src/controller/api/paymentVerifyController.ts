@@ -17,26 +17,36 @@ const paymentVerifyController: RequestHandler<any, any, any, ReqQuery> =
     let success: boolean;
 
     const { Authority, Status } = req.query;
-    const order = await Order.findOne({
+    const orders = await Order.find({
       authority: Authority,
       paid: false,
-    }).populate("user");
+    });
 
-    if (!order) return res.redirect("/404");
+    console.log({ orders });
+
+    if (!orders.length) return res.redirect("/404");
+    const order = await orders[0].populate("user");
+    console.log({ order });
     const session = await Session.find().byUserId(order.userId);
     if (!session) return res.redirect("/404");
 
+    // payment verify
     const response = await verifyPayment(
       (order as unknown as TOrder).price,
       Authority
     );
+
+    // update orders
     if (Status === "OK" && response) {
-      order.paid = true;
-      order.authority = "";
-      order.refId = response;
-      order.save();
+      orders.forEach((order) => {
+        order.paid = true;
+        order.authority = "";
+        order.refId = response;
+        order.save();
+      });
       success = true;
 
+      // update bot messages
       if (session.paymentMessageId) {
         bot.telegram.deleteMessage(session.chatId, session.paymentMessageId);
         session.paymentMessageId = undefined;
@@ -45,10 +55,13 @@ const paymentVerifyController: RequestHandler<any, any, any, ReqQuery> =
     } else {
       success = false;
     }
+
+    // send message
     const messages = new OrderMessages(session);
     const message = messages.purchaseResult(success);
     bot.telegram.sendMessage(session?.chatId, message);
 
+    // render html
     res.render("payment-result", {
       order,
       response: response,

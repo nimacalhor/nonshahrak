@@ -1,11 +1,13 @@
-import { Order, OrderModel, OrderQueryHelpers } from "@t/order";
-import mongoose from "mongoose";
-import buttons from "@constants/bot/button-labels";
-import { byUserId, todays, tomorrows } from "./query-helpers";
-import { getPersianDate, getTomorrowsDate } from "@src/lib/helper/date-helper";
-import { compareEnum } from "@src/lib/helper/bot";
-import ButtonLabels from "@constants/bot/button-labels";
+import {
+  default as ButtonLabels,
+  default as buttons,
+} from "@constants/bot/button-labels";
 import { BreadPrices } from "@src/lib/constants/general";
+import { compareEnum } from "@src/lib/helper/bot";
+import { getTomorrowsDate } from "@src/lib/helper/date-helper";
+import { Order, OrderDoc, OrderModel, OrderQueryHelpers } from "@t/order";
+import mongoose from "mongoose";
+import { byUserId, tomorrows } from "./query-helpers";
 import { dateString } from "./virtuals";
 
 const orderSchema = new mongoose.Schema<
@@ -37,15 +39,24 @@ const orderSchema = new mongoose.Schema<
     date: {
       type: Date,
       default: getTomorrowsDate(),
+      set: function (this: OrderDoc, value: Date) {
+        this.day = value.getDate();
+        this.month = value.getMonth();
+        this.year = value.getFullYear();
+        return value;
+      },
     },
+    day: { type: Number },
+    month: { type: Number },
+    year: { type: Number },
     authority: { type: String, default: "" },
     paid: { type: Boolean, default: false },
     refId: { type: Number },
+    duplicated: { type: Boolean, default: false },
   },
   {
     query: {
-      byUserId,
-      todays,
+      byUserId: byUserId as unknown as OrderQueryHelpers["byUserId"],
       tomorrows,
     },
   }

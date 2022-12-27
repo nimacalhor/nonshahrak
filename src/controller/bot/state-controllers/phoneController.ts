@@ -11,19 +11,18 @@ import {
 import OrderMessages from "@view/messages";
 import { isNumber } from "@src/lib/helper";
 import AlertMessages from "@src/view/messages/AlertMessages";
-import Session from "@src/model/Session";
 
 const phoneController: Controller = async function (ctx) {
-  const entry = ctx.message?.text as string;
-  const messages = new OrderMessages(await Session.find().byCtx(ctx), await isOrderTypeTomorrow(getUserId(ctx)));
-  const phoneNumber = ctx.message?.contact?.phone_number;
+  const entry = ctx.entry;
+  const messages = new OrderMessages(ctx.session, ctx.isTomorrow)
+  const phoneNumber = ctx.phoneNumber;
   const finalResult = getControllerResult(
     messages.getBlock(),
     SessionStates.ENTERING_BLOCK,
     buttons.enterBlock
   );
   if (phoneNumber) {
-    await setOrderSession(getUserId(ctx), "phone", phoneNumber);
+    await setOrderSession(ctx, ctx.userId, "phone", phoneNumber);
     return finalResult;
   }
   if (!isNumber(entry))
@@ -38,7 +37,7 @@ const phoneController: Controller = async function (ctx) {
       SessionStates.ENTERING_PHONE,
       buttons.enterPhoneButtons
     );
-  await setOrderSession(getUserId(ctx), "phone", entry);
+  await setOrderSession(ctx, ctx.userId, "phone", entry);
   return finalResult;
 };
 

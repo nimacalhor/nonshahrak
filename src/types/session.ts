@@ -37,6 +37,7 @@ export interface Session {
   order: SessionOrder;
   paymentMessageId?: number;
   enteringProfile: boolean;
+  thereIsPaymentMessage?: boolean;
 }
 
 export type SessionOrderDoc = HydratedDocument<SessionOrder>;

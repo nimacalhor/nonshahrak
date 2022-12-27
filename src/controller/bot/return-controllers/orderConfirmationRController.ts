@@ -9,11 +9,11 @@ import {
 } from "@helper/bot";
 import OrderMessages from "@view/messages";
 import User from "@src/model/User";
-import Session from "@src/model/Session";
+
 
 const orderConfirmationRController: Controller = async function (ctx) {
-  const messages = new OrderMessages(await Session.find().byCtx(ctx), await isOrderTypeTomorrow(getUserId(ctx)));
-  const user = await User.find().byUserId(getUserId(ctx));
+  const messages = new OrderMessages(ctx.session, ctx.isTomorrow)
+  const user = await User.find().byUserId(ctx.userId);
   if (user)
     return getControllerResult(
       messages.getProfileConfirmation(user),

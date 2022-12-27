@@ -1,28 +1,19 @@
-import { ControllerResult } from "./../../../types/controller";
 import AlertMessages from "@src/view/messages/AlertMessages";
 import { SessionStates } from "@constants/bot/session";
 import ControllerTypes from "@constants/controllerTypes";
 import { Controller } from "@t/controller";
 import buttons from "@view/reply-markups";
 import {
-  isOrderTypeTomorrow,
   getControllerResult,
-  setOrderSession,
   getUserId,
 } from "@helper/bot";
 import OrderMessages from "@view/messages";
-import Session from "@src/model/Session";
 import Keywords from "@src/lib/constants/bot/keywords";
 import Order from "@src/model/Order";
 
 const myOrdersController: Controller = async function (ctx) {
-  const entry = ctx.message?.text as string;
-  const session = await Session.find().byCtx(ctx);
-  const userId = getUserId(ctx);
-  const messages = new OrderMessages(
-    session,
-    await isOrderTypeTomorrow(userId)
-  );
+  const userId = ctx.userId;
+  const messages = new OrderMessages(null);
   ctx.reply("⏳ ...");
 
   const orders = await Order.find().byUserId(userId).where("paid").equals(true);
@@ -31,11 +22,12 @@ const myOrdersController: Controller = async function (ctx) {
     return getControllerResult(
       AlertMessages.noSubmittedOrder,
       SessionStates.UNDEFINED,
-      buttons.myOrdersButtons
+      buttons.mainButtons
     );
   orders
     .slice(0, orders.length - 1)
     .forEach((order) => ctx.reply(messages.getOrderString(order)));
+
   return getControllerResult(
     messages.getOrderString(orders.slice(orders.length - 1)[0]),
     SessionStates.UNDEFINED,

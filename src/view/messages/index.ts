@@ -161,14 +161,14 @@ class OrderMessages {
     return this.getAddressMessage(ENTER_UNIT);
   }
 
-  orderSubmitted() {
-    return this.getOrderMessage(
-      `${ORDER_SUBMITTED}${
-        this.tomorrow
-          ? `\n ${CLICK_FOR_PAYMENT}`
-          : `${CHECK_MY_ORDERS_FOR_MORE}`
-      }`
-    );
+  orderSubmitted(finalPurchase?: boolean) {
+    let result = `${ORDER_SUBMITTED}${
+      this.tomorrow || finalPurchase
+        ? `\n ${CLICK_FOR_PAYMENT}`
+        : `${CHECK_MY_ORDERS_FOR_MORE}`
+    }`;
+    if (!finalPurchase) result = this.getOrderMessage(result);
+    return result;
   }
 
   purchaseResult(success: boolean) {
@@ -266,6 +266,11 @@ class OrderMessages {
   getOrderString(order: OrderDoc | DailyOrderDoc) {
     const { amount, breadType, dateString, time } = order;
     return `${amount} نون ${breadType} برای ${dateString}، ساعت ${time}.`;
+  }
+
+  purchaseNextWeek(orders: OrderDoc[]) {
+    return `پرداخت سفارش های
+    ${orders.map((order) => this.getOrderString(order)).join("\n")}`;
   }
 }
 

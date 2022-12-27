@@ -1,22 +1,23 @@
-import {
-  getControllerResult,
-  getUserId,
-  isOrderTypeTomorrow,
-  setOrderSession,
-} from "@src/lib/helper/bot";
 import ButtonLabels from "@src/lib/constants/bot/button-labels";
 import { SessionStates } from "@src/lib/constants/bot/session";
 import ControllerTypes from "@src/lib/constants/controllerTypes";
-import { compareEnum } from "@src/lib/helper/bot";
+import {
+  compareEnum,
+  getControllerResult,
+  setOrderSession,
+} from "@src/lib/helper/bot";
+import { getTomorrowsDate } from "@src/lib/helper/date-helper";
+import DailyOrder from "@src/model/DailyOrder";
+import Order from "@src/model/Order";
 import { Controller } from "@src/types/controller";
 import OrderMessages from "@src/view/messages";
 import AlertMessages from "@src/view/messages/AlertMessages";
 import buttons from "@view/reply-markups";
-import Session from "@src/model/Session";
 
 const orderTypeController: Controller = async function (ctx) {
-  const entry = ctx.message?.text as string;
+  const entry = ctx.entry;
 
+  // check buttons
   if (
     !compareEnum(
       entry,
@@ -30,13 +31,33 @@ const orderTypeController: Controller = async function (ctx) {
       buttons.orderTypeButtons
     );
 
-  await setOrderSession(getUserId(ctx), "type", entry);
-  const isTomorrow = await isOrderTypeTomorrow(getUserId(ctx));
-  const messages = new OrderMessages(
-    await Session.find().byCtx(ctx),
-    isTomorrow
-  );
-  const session = await Session.find().byUserId(getUserId(ctx));
+  ctx.reply("⌛ ...");
+
+  await setOrderSession(ctx, ctx.userId, "type", entry);
+
+  let itemExists: boolean = false;
+  let isTomorrow: boolean = ctx.isTomorrow;
+  const userId = ctx.userId;
+
+  // if tomorrow
+  if (isTomorrow) {
+    const orderForTomorrow = await Order.exists({
+      userId,
+      day: getTomorrowsDate().getDate(),
+      month: getTomorrowsDate().getMonth(),
+    });
+    if (orderForTomorrow) itemExists = true;
+  }
+  // if daily
+  else {
+    const dailyOrder = await DailyOrder.exists({ userId });
+    if (dailyOrder) itemExists = true;
+  }
+
+  if (itemExists) ctx.reply(AlertMessages.orderExists(isTomorrow));
+
+  const session = ctx.session;
+  const messages = new OrderMessages(session, isTomorrow);
   const days: string[] = session ? session.order.days : [];
 
   const message = isTomorrow

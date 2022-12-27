@@ -9,11 +9,11 @@ import {
   getUserId,
 } from "@helper/bot";
 import OrderMessages from "@view/messages";
-import Session from "@src/model/Session";
+
 
 const entranceRController: Controller = async function (ctx) {
-  const messages = new OrderMessages(await Session.find().byCtx(ctx), await isOrderTypeTomorrow(getUserId(ctx)));
-  await setOrderSession(getUserId(ctx), ["entrance", "block"], undefined);
+  const messages = new OrderMessages(ctx.session, ctx.isTomorrow)
+  await setOrderSession(ctx, ctx.userId, ["entrance", "block"], undefined);
   return getControllerResult(
     messages.getBlock(),
     SessionStates.ENTERING_BLOCK,

@@ -4,10 +4,9 @@ import buttons from "@view/reply-markups";
 import { SessionStates } from "@src/lib/constants/bot/session";
 import Keywords from "@src/lib/constants/bot/keywords";
 import ControllerTypes from "@src/lib/constants/controllerTypes";
-import Session from "@src/model/Session";
 
 const orderBreadController: Controller = async function (ctx) {
-  const message = new OrderChainMessages(await Session.find().byCtx(ctx))
+  const message = new OrderChainMessages(null)
     .orderBread;
 
   return {
