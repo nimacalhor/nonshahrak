@@ -70,13 +70,8 @@ const orderConfirmationController: Controller = async function (ctx) {
   if (!isTomorrow) {
     const { days, breadType, amount, time } = session.order;
     const dailyOrderToReplace = await DailyOrder.find().byUserId(userId);
-    let dailyOrderToReplaceSavePromise: Promise<any> = Promise.resolve();
-    if (dailyOrderToReplace) {
-      dailyOrderToReplace.duplicated = true;
-      dailyOrderToReplaceSavePromise = dailyOrderToReplace.save();
-    }
     await Promise.all([
-      dailyOrderToReplaceSavePromise,
+      dailyOrderToReplace?.remove(),
       DailyOrder.create({
         days: daysToIndex(days),
         breadType,

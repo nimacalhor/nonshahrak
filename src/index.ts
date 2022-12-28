@@ -13,10 +13,11 @@ import mongoose from "mongoose";
 import mainBot from "./bot";
 import api from "./api";
 
-const connectionString =
+const connectionString = (
   process.env.NODE_ENV === "development"
     ? (process.env.DB_CONNECTION_STRING_DEV as string)
-    : (process.env.DB_CONNECTION_STRING_DEV as string);
+    : (process.env.DB_CONNECTION_STRING_DEV as string)
+).replace("<password>", process.env.CLUSTER_PASSWORD + "");
 
 const port = process.env.PORT;
 

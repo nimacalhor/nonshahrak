@@ -1,0 +1,23 @@
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+var ButtonLabels;
+(function (ButtonLabels) {
+    ButtonLabels["ORDER_BREAD"] = "\u0633\u0641\u0627\u0631\u0634 \u0646\u0648\u0646 \uD83C\uDF5E";
+    ButtonLabels["MY_ORDERS"] = "\u0633\u0641\u0627\u0631\u0634\u0627\u062A \u062B\u0628\u062A \u0634\u062F\u0647 \u2705";
+    ButtonLabels["MY_DAILY_ORDERS"] = "\u0633\u0641\u0627\u0631\u0634\u0627\u062A \u0647\u0641\u062A\u06AF\u06CC \u0645\u0646 \uD83D\uDCC3";
+    ButtonLabels["ORDER_TYPE_TOMORROW"] = "\u0631\u0648\u0632\u0627\u0646\u0647 (\u0646\u0627\u0646 \u0641\u0631\u062F\u0627) \u2600";
+    ButtonLabels["ORDER_TYPE_DAILY"] = "\u0647\u0641\u062A\u06AF\u06CC (\u0646\u0627\u0646 \u0628\u0631\u0627\u06CC \u0631\u0648\u0632 \u0647\u0627\u06CC \u06CC\u0646 \u0647\u0641\u062A\u0647) \uD83D\uDCC5";
+    ButtonLabels["RETURN"] = "\u0628\u0627\u0632\u06AF\u0634\u062A \u2B05";
+    ButtonLabels["MY_NUMBER"] = "\u0634\u0645\u0627\u0631\u0647 \u062E\u0648\u062F\u0645";
+    ButtonLabels["LONE_ENTRANCE"] = "\u062A\u06A9 \u0648\u0631\u0648\u062F\u06CC";
+    ButtonLabels["CONFIRM"] = "\u062A\u0627\u06CC\u06CC\u062F \u2705";
+    ButtonLabels["CANCEL_ORDER"] = "\u0644\u063A\u0648 \u0633\u0641\u0627\u0631\u0634 \u274C";
+    ButtonLabels["BARBARI"] = "\u0628\u0631\u0628\u0631\u06CC";
+    ButtonLabels["SANAQAK"] = "\u0633\u0646\u06AF\u06A9";
+    ButtonLabels["ENTER_PROFILE"] = "\u0648\u0627\u0631\u062F \u06A9\u0631\u062F\u0646 \u0627\u0637\u0644\u0627\u0639\u0627\u062A \u2712";
+    ButtonLabels["CONTINUE_WITH_THIS_INFO"] = "\u062B\u0628\u062A \u0633\u0641\u0627\u0631\u0634 \u0628\u0627 \u0627\u06CC\u0646 \u0627\u0637\u0644\u0627\u0639\u0627\u062A \u2705";
+    ButtonLabels["PAY"] = "\u067E\u0631\u062F\u0627\u062E\u062A \uD83D\uDCB3";
+    ButtonLabels["DONE"] = "\u0627\u0646\u062C\u0627\u0645 \u0634\u062F \u2705";
+    ButtonLabels["PURCHASE_NEXT_WEEK"] = "\u067E\u0631\u062F\u0627\u062E\u062A \u0647\u0641\u062A\u0647 \u0622\u06CC\u0646\u062F\u0647";
+})(ButtonLabels || (ButtonLabels = {}));
+exports.default = ButtonLabels;

@@ -57,6 +57,12 @@ const dailyOrdersController: Controller = async function (ctx) {
   if (day === "purchaseNextWeek" || !timestamp) {
     //
     const nextWeekDates = getNextWeekDates(dailyOrder.days);
+    console.log({
+      nextWeekDates: nextWeekDates.map((dt) => ({
+        day: dt.getDate(),
+        month: dt.getMonth(),
+      })),
+    });
     // paid orders in next week
     const paidOrdersInNextWeek = await Order.find({
       userId,
@@ -67,6 +73,7 @@ const dailyOrdersController: Controller = async function (ctx) {
         month: dt.getMonth(),
       })),
     }).select(["day", "month"]);
+    console.log({ paidOrdersInNextWeek });
 
     // all next week orders were purchased
     if (nextWeekDates.length === paidOrdersInNextWeek.length)
@@ -83,6 +90,12 @@ const dailyOrdersController: Controller = async function (ctx) {
           (doc) => doc.day === date.getDate() && doc.month === date.getMonth()
         )
     );
+    console.log({
+      notPaidDates: notPaidDates.map((dt) => ({
+        day: dt.getDate(),
+        month: dt.getMonth(),
+      })),
+    });
 
     await Order.insertMany(
       notPaidDates.map((dt) => ({
@@ -92,7 +105,7 @@ const dailyOrdersController: Controller = async function (ctx) {
         user: (dailyOrder.user as unknown as UserDoc)._id,
         authority: response.authority,
         userId,
-        date: dt,
+        date: new Date(dt),
       }))
     );
 
@@ -133,7 +146,7 @@ const dailyOrdersController: Controller = async function (ctx) {
     user: (dailyOrder.user as unknown as UserDoc)._id,
     authority: response.authority,
     userId,
-    date: new Date(parseInt(timestamp)).setHours(0, 0, 0, 0),
+    date: new Date(parseInt(timestamp)),
   });
 
   if (session) {

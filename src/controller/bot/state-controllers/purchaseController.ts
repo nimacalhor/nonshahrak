@@ -12,16 +12,12 @@ import Order from "@src/model/Order";
 
 const purchaseController: Controller = async function (ctx) {
   const session = ctx.session;
-  const messages = new OrderMessages(
-    session,
-    ctx.isTomorrow
-  );
-  const order = await Order.find()
+  const messages = new OrderMessages(session, ctx.isTomorrow);
+  const orders = await Order.find()
     .byUserId(ctx.userId)
     .where("paid")
-    .equals(false)
-    .findOne();
-  order && order.remove();
+    .equals(false);
+  orders.forEach((order) => order.remove());
 
   const messageId = session?.paymentMessageId;
   if (messageId) ctx.deleteMessage(messageId);

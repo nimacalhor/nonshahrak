@@ -30,7 +30,7 @@ const weekdaysController: Controller = async function (ctx) {
       ...new Set([...(session.order.days || []), entry]),
     ]);
     const messages = new OrderMessages(
-      await Session.find().byCtx(ctx),
+      ctx.session,
       ctx.isTomorrow
     );
     return getControllerResult(
@@ -49,7 +49,7 @@ const weekdaysController: Controller = async function (ctx) {
       )
     );
     const messages = new OrderMessages(
-      await Session.find().byCtx(ctx),
+      ctx.session,
       ctx.isTomorrow
     );
     return getControllerResult(
@@ -66,7 +66,7 @@ const weekdaysController: Controller = async function (ctx) {
         buttons.chooseWeekdaysButtons([])
       );
     const messages = new OrderMessages(
-      await Session.find().byCtx(ctx),
+      ctx.session,
       ctx.isTomorrow
     );
     return getControllerResult(

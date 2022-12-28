@@ -1,0 +1,22 @@
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.SessionStates = void 0;
+var SessionStates;
+(function (SessionStates) {
+    SessionStates["ENTERING_ORDER_TYPE"] = "ENTERING_ORDER_TYPE";
+    SessionStates["ENTERING_WEEK_DAYS"] = "ENTERING_WEEK_DAYS";
+    SessionStates["ENTERING_BREAD_TYPE"] = "ENTERING_BREAD_TYPE";
+    SessionStates["ENTERING_BREAD_AMOUNT"] = "ENTERING_BREAD_AMOUNT";
+    SessionStates["ENTERING_TIME"] = "ENTERING_TIME";
+    SessionStates["PROFILE_CONFIRMATION"] = "PROFILE_CONFIRMATION";
+    SessionStates["ENTERING_NAME"] = "ENTERING_NAME";
+    SessionStates["ENTERING_PHONE"] = "ENTERING_PHONE";
+    SessionStates["ENTERING_BLOCK"] = "ENTERING_BLOCK";
+    SessionStates["ENTERING_ENTRANCE"] = "ENTERING_ENTRANCE";
+    SessionStates["ENTERING_FLOOR_LEVEL"] = "ENTERING_FLOOR_LEVEL";
+    SessionStates["WATCHING_ORDERS"] = "WATCHING_ORDERS";
+    SessionStates["ENTERING_UNIT"] = "ENTERING_UNIT";
+    SessionStates["ORDER_CONFIRMATION"] = "ORDER_CONFIRMATION";
+    SessionStates["PURCHASING_ORDER"] = "PURCHASING_ORDER";
+    SessionStates["UNDEFINED"] = "";
+})(SessionStates = exports.SessionStates || (exports.SessionStates = {}));

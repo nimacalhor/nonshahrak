@@ -1,0 +1,107 @@
+.result {
+  padding-top: 2rem;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+}
+.result__upper {
+  width: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex-direction: row-reverse;
+  font-size: clamp(1.56rem, 1vw + 1.31rem, 2.11rem);
+}
+.result__upper__title {
+  margin-left: 1rem;
+  color: #181d31;
+}
+@media only screen and (max-width: 355px) {
+  .result__upper__icon {
+    display: none !important;
+  }
+}
+.result__center {
+  width: min(100%, 23rem);
+}
+.result__center__table {
+  width: 100% !important;
+  border: 2px solid #e6ddc4;
+  border-radius: 0.5rem;
+  padding: 0;
+  border-collapse: collapse;
+}
+.result__center__table__tr {
+  display: flex;
+  justify-content: space-between;
+  flex-direction: row-reverse;
+  padding: 0.5rem;
+}
+.result__center__table__tr:nth-child(odd) {
+  background-color: rgba(222, 211, 178, 0.6);
+}
+.result__center__table__tr__td {
+  flex-basis: 50%;
+  text-align: right;
+}
+
+.gg-close-r {
+  box-sizing: border-box;
+  position: relative;
+  display: block;
+  transform: scale(var(--ggs, 1));
+  width: 64px;
+  height: 64px;
+  border: 3px solid;
+  border-radius: 6px;
+  color: #b44b4b;
+}
+
+.gg-close-r::after,
+.gg-close-r::before {
+  content: "";
+  display: block;
+  box-sizing: border-box;
+  position: absolute;
+  width: 64px;
+  height: 4px;
+  background: currentColor;
+  transform: rotate(45deg);
+  border-radius: 5px;
+  top: 27px;
+  left: -3px;
+}
+
+.gg-close-r::after {
+  transform: rotate(-45deg);
+}
+
+.gg-check-r {
+  box-sizing: border-box;
+  position: relative;
+  display: block;
+  width: 64px;
+  height: 64px;
+  border: 3px solid #3cb49e;
+  transform: scale(var(--ggs, 1));
+  border-radius: 4px;
+}
+
+.gg-check-r::after {
+  content: "";
+  display: block;
+  box-sizing: border-box;
+  position: absolute;
+  left: 4px;
+  top: -17px;
+  width: 24px;
+  height: 50px;
+  border-width: 0 4px 4px 0;
+  border-style: solid;
+  border-color: #3cb49e;
+  transform-origin: bottom left;
+  transform: rotate(45deg);
+}
+
+/*# sourceMappingURL=payment-result.css.map */

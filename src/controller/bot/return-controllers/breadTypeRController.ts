@@ -16,14 +16,14 @@ const breadTypeRController: Controller = async function (ctx) {
   const  isTomorrow = ctx.isTomorrow;
   if (isTomorrow) {
     await setOrderSession(ctx, ctx.userId, "type", undefined);
-    const messages = new OrderMessages(await Session.find().byCtx(ctx), isTomorrow);
+    const messages = new OrderMessages(ctx.session, isTomorrow);
     return getControllerResult(
       messages.orderBread,
       SessionStates.ENTERING_ORDER_TYPE,
       buttons.orderTypeButtons
     );
   }
-  const messages = new OrderMessages(await Session.find().byCtx(ctx), isTomorrow);
+  const messages = new OrderMessages(ctx.session, isTomorrow);
   const session = await setOrderSession(ctx, ctx.userId, "days", []);
   const days = session ? session.order.days : [];
   return getControllerResult(

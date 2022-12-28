@@ -15,7 +15,7 @@ import User from "@src/model/User";
 
 const nameRController: Controller = async function (ctx) {
 const messages = new OrderMessages(ctx.session, ctx.isTomorrow)
-  const session = (await Session.find().byCtx(ctx)) as SessionDoc;
+  const session = (ctx.session) as SessionDoc;
   const user = await User.find().byUserId(session.userId);
   //
   if (session.enteringProfile && user) {

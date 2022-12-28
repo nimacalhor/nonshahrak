@@ -22,12 +22,13 @@ const paymentVerifyController: RequestHandler<any, any, any, ReqQuery> =
       paid: false,
     });
 
-    console.log({ orders });
-
     if (!orders.length) return res.redirect("/404");
-    const order = await orders[0].populate("user");
-    console.log({ order });
-    const session = await Session.find().byUserId(order.userId);
+    const order = orders[0];
+
+    const [duplicatedOrders, session] = await Promise.all([
+      Order.find().byUserId(order.userId).where("duplicated").equals(true),
+      Session.find().byUserId(order.userId),
+    ]);
     if (!session) return res.redirect("/404");
 
     // payment verify
@@ -44,6 +45,8 @@ const paymentVerifyController: RequestHandler<any, any, any, ReqQuery> =
         order.refId = response;
         order.save();
       });
+      duplicatedOrders.forEach((order) => order.remove());
+
       success = true;
 
       // update bot messages
@@ -54,6 +57,10 @@ const paymentVerifyController: RequestHandler<any, any, any, ReqQuery> =
       }
     } else {
       success = false;
+      duplicatedOrders.forEach((order) => {
+        order.duplicated = false;
+        order.save();
+      });
     }
 
     // send message

@@ -18,12 +18,13 @@ const getPersianDate = (date: Date) => {
   return { day: day.replace(/^۰/g, ""), weekday, month, year };
 };
 
-export const getNextDate = function (day: number, doubleNext?: boolean) {
+export const getNextDate = function (day: number, nextWeek?: boolean) {
   const date = new Date();
-  date.setHours(0, 0, 0, 0);
-  const now = doubleNext ? day + 1 : date.getDay();
+  const now = date.getDay();
   let diff = day - now;
-  diff = diff < 1 ? 7 + diff : diff;
+  // if day < today result will be in next week
+  if (!nextWeek) diff = diff < 1 ? 7 + diff : diff;
+  else diff = diff + 7;
 
   const nextDayTimestamp = date.getTime() + 1000 * 60 * 60 * 24 * diff;
 
@@ -37,10 +38,9 @@ export const getDateMessage = function (date: Date) {
 
 export const getNextWeekDates = function (days: number[]): Date[] {
   const date = new Date();
-  date.setHours(0, 0, 0, 0);
   const weekday = date.getDay();
   return days.map((d) => {
-    return getNextDate(d, d >= weekday);
+    return getNextDate(d, true);
   });
 };
 

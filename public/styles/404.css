@@ -1,0 +1,18 @@
+.container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex-direction: column;
+}
+.container__title {
+  font-size: clamp(8rem, 20vw, 12rem);
+  margin-block: 0;
+  color: #678983;
+}
+.container__text {
+  font-size: clamp(1.56rem, 1vw + 1.31rem, 2.11rem);
+  color: #181d31;
+  margin: 0 auto 2rem auto;
+}
+
+/*# sourceMappingURL=404.css.map */
